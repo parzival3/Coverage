@@ -56,7 +56,16 @@ val defaultVersions = Seq(
 libraryDependencies ++= defaultVersions.map { case (dep, ver) =>
   "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", ver) }
 
+libraryDependencies ++= Seq(
+  "org.choco-solver" % "choco-solver" % "4.10.2"
+)
+
+libraryDependencies ++= Seq(
+  "com.vladsch.flexmark" % "flexmark-all" % "0.35.10",
+)
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 scalacOptions ++= Seq("-deprecation", "-feature", "-language:reflectiveCalls")
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
+
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-C",  "org.scalatest.tools.CoverageHtmlReporter")

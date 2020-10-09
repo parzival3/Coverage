@@ -1,7 +1,7 @@
 import chisel3.{fromIntToLiteral, fromIntToWidth}
 import chiseltest.{ChiselScalatestTester, testableClock, testableData}
 import chiseltest.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
-import chiseltest.internal.{TestOptionObject, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
+import chiseltest.internal.{LineCoverageAnnotation, TestOptionObject, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import coverage.Coverage
 import coverage.test.utils.Alu
 import org.scalatest.flatspec.AnyFlatSpec
@@ -65,18 +65,33 @@ trait AluBehavior {
   }
 }
 
-
-class AluTestTraditional extends AnyFlatSpec with Coverage with ChiselScalatestTester with Matchers {
+class AluTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
   behavior of "ALU"
 
   def mask(s: Int): Int = (1 << 4) - 1
 
-//  val annotationsSeq = Seq(
-//    VerilatorBackendAnnotation,
-//    ToggleCoverageAnnotation,
-//    LineCoverageAnnotation)
+  val result = (2 + 1) & mask(4)
+  it should "test static circuits" in {
+    test(new Alu(4)) { c =>
+      c.io.fn.poke(2.U)
+      c.io.a.poke(2.U(4.W))
+      c.io.b.poke(1.U(4.W))
+      c.clock.step()
+      c.io.result.expect(result.U(4.W))
+    }
+  }
+}
 
-  val annotationsSeq = Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation)
+class AluTestVerilator extends AnyFlatSpec with Coverage with ChiselScalatestTester with Matchers {
+  behavior of "ALU"
+
+  def mask(s: Int): Int = (1 << 4) - 1
+
+  val annotationsSeq = Seq(
+    VerilatorBackendAnnotation,
+    ToggleCoverageAnnotation,
+    LineCoverageAnnotation)
+
 
   val result = (2 + 1) & mask(4)
   it should "test static circuits" in {

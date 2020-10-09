@@ -3,3 +3,4 @@ coverage/*
 project/*
 test_run_dir
 target/*
+output/*
