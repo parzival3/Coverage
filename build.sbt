@@ -2,7 +2,6 @@ name := "Coverage"
 
 version := "0.1"
 
-
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   Seq() ++ {
     // If we're building with Scala > 2.11, enable the compile option
@@ -29,10 +28,9 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
   }
 }
 
-
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.8",
-  "org.scalatest" %% "scalatest" % "3.2.0" % "test",
+  "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 )
 
 scalaVersion := "2.12.10"
@@ -54,19 +52,25 @@ val defaultVersions = Seq(
   "treadle" -> "1.3-SNAPSHOT"
 )
 
-libraryDependencies ++= defaultVersions.map { case (dep, ver) =>
-  "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", ver) }
+libraryDependencies ++= Seq(
+  "com.googlecode.jgenhtml" % "jgenhtml" % "1.5"
+)
+
+libraryDependencies ++= defaultVersions.map {
+  case (dep, ver) =>
+    "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", ver)
+}
 
 libraryDependencies ++= Seq(
   "org.choco-solver" % "choco-solver" % "4.10.2"
 )
 
 libraryDependencies ++= Seq(
-  "com.vladsch.flexmark" % "flexmark-all" % "0.35.10",
+  "com.vladsch.flexmark" % "flexmark-all" % "0.35.10"
 )
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 scalacOptions ++= Seq("-deprecation", "-feature", "-language:reflectiveCalls")
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
 
-testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-C",  "org.scalatest.tools.CoverageHtmlReporter")
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-C", "org.scalatest.tools.CoverageHtmlReporter")

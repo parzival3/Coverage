@@ -6,14 +6,16 @@ import java.security.{DigestInputStream, MessageDigest}
 
 import chiseltest.ChiselScalatestTester
 import chiseltest.experimental.sanitizeFileName
+import com.googlecode.jgenhtml.{Config, CoverageReport}
 import coverage.CoverageUtils.getListOfFiles
+import coverage.tools.CoverageInformations
 import org.scalatest.{Outcome, TestSuite}
 
 import scala.sys.process._
 
 object CoverageUtils {
 
-  def getListOfFiles(dir: String, ext: String):List[String] = {
+  def getListOfFiles(dir: String, ext: String): List[String] = {
     val d = new File(dir)
     if (d.exists && d.isDirectory) {
       d.listFiles.filter(x => x.isFile && x.getName.endsWith(ext)).map(dir + "/" + _.getName).toList
@@ -27,7 +29,7 @@ object CoverageUtils {
   }
 
   def generateReport(coveragePath: String, infoFile: String) = {
-    val result = Seq("bash", "-c", "cd",  s"$coveragePath/", "&&", "genhtml", s"$infoFile").!
+    val result = Seq("bash", "-c", "cd", s"$coveragePath/", "&&", "genhtml", s"$infoFile").!
     if (result != 0) {
       throw new Exception(s"Couldn't create coverage report: $result")
     }
@@ -40,7 +42,7 @@ object CoverageUtils {
     val percentage = raw"(\d?\d\d\.?\d?\d)%".r
     percentage.findFirstIn(output) match {
       case Some(x) => Some(x.replaceAll("%", "").toFloat)
-      case None => None
+      case None    => None
     }
   }
 
@@ -57,16 +59,19 @@ object CoverageUtils {
     }
   }
 
-  def createInfoFile(infoFile: String, datFile: String): Unit = {
-    val result = s"verilator_coverage --write-info $infoFile $datFile".!
-    if (result != 0) {
-      throw new Exception(s"Couldn't create info file: $result")
-    }
+  def createInfoFile(infoFile: String, datFile: String, sourcePath: String): Unit = {
+    val cover = new CoverageInformations
+    cover.readCoverage(datFile)
+    cover.writeInfo(infoFile, sourcePath)
+//    val result = s"verilator_coverage --write-info $infoFile $datFile".!
+//    if (result != 0) {
+//      throw new Exception(s"Couldn't create info file: $result")
+//    }
   }
 
   private def fileChecksum(filepath: String, mdIn: MessageDigest): String = {
     var mdOut: Option[MessageDigest] = None
-    var dis: Option[DigestInputStream] = None
+    var dis:   Option[DigestInputStream] = None
     // file hashing with DigestInputStream
     try {
       dis = Some(new DigestInputStream(new BufferedInputStream(new FileInputStream(filepath)), mdIn))
@@ -79,21 +84,19 @@ object CoverageUtils {
         }
         case None => mdOut = None
       }
-    }
-    catch {
+    } catch {
       case ioe: IOException => {
         mdOut = null
         System.err.println(ioe.getMessage)
       }
-    }
-    finally {
+    } finally {
       dis match {
         case Some(x) => x.close()
       }
     }
     mdOut match {
       case Some(out) => convertBytesToHex(out.digest)
-      case None => ""
+      case None      => ""
     }
   }
 
@@ -109,10 +112,10 @@ object CoverageUtils {
     def apply(simDir: String, destinationDirPath: String, fileExstension: String): Unit = {
       new File(destinationDirPath).mkdirs()
       val filesToCopy = getListOfFiles(simDir, fileExstension)
-      filesToCopy.foreach{ f =>
+      filesToCopy.foreach { f =>
         try {
           val file = getFileName(f)
-          Files.createFile( Paths.get(destinationDirPath +"/" + file))
+          Files.createFile(Paths.get(destinationDirPath + "/" + file))
           Files.copy(
             Paths.get(simDir + "/" + file),
             Paths.get(destinationDirPath + "/" + file),
@@ -129,20 +132,28 @@ object CoverageUtils {
   }
 
   def getCoverageReport(path: String): Float = {
-    val reportOutput = CoverageUtils.generateReport(path, "total/output.info")
-    CoverageUtils.extractPercentage(reportOutput).getOrElse(0)
+    val file = new Array[String](1)
+    file(0) = path + "/total/output.info"
+    val config = new Config()
+    config.initializeUserPrefs(List("--output-directory", path).toArray)
+    CoverageReport.setConfig(config)
+    val coverageReport = new CoverageReport(file)
+    coverageReport.generateReports()
+    100
+//    val reportOutput = CoverageUtils.generateReport(path, "total/output.info")
+//    CoverageUtils.extractPercentage(reportOutput).getOrElse(0)
   }
 
   object CopyFilesRename {
     def apply(simDir: String, destinationDirPath: String, fileExstension: String): Unit = {
       new File(destinationDirPath).mkdirs()
       val filesToCopy = getListOfFiles(simDir, fileExstension)
-      filesToCopy.foreach{ f =>
+      filesToCopy.foreach { f =>
         try {
           val file = getFileName(f)
-          val fileDir =  simDir.replace("/logs", "")
+          val fileDir = simDir.replace("/logs", "")
           val newName = fileDir.replace("/logs", "").substring(fileDir.lastIndexOf("/") + 1) + ".dat"
-          Files.createFile( Paths.get(destinationDirPath +"/" + newName))
+          Files.createFile(Paths.get(destinationDirPath + "/" + newName))
           Files.copy(
             Paths.get(simDir + "/" + file),
             Paths.get(destinationDirPath + "/" + newName),
@@ -163,7 +174,7 @@ object CoverageUtils {
         try {
           Files.delete(Paths.get(f.toString))
         } catch {
-          case ex @ (_:IOException | _:NoSuchFileException) => {
+          case ex @ (_: IOException | _: NoSuchFileException) => {
             println(s"Something wrong happened while deleting $f in $path")
             throw ex
           }
@@ -194,7 +205,7 @@ trait Coverage extends ChiselScalatestTester {
     sanitizeFileName(name)
   }
 
-  def createSuiteCoverageFolder(): Unit  = {
+  def createSuiteCoverageFolder(): Unit = {
     CoverageUtils.makeFolder(coveragePath)
     CoverageUtils.makeFolder(coverageFolder)
     CoverageUtils.makeFolder(s"$coverageFolder/total")
@@ -227,7 +238,7 @@ trait Coverage extends ChiselScalatestTester {
     by genhtml program to generate the actual report
    */
   def createInfoFile(path: String = coverageFolder) = {
-    CoverageUtils.createInfoFile(s"$path/total/output.info", s"$path/total/output.dat")
+    CoverageUtils.createInfoFile(s"$path/total/output.info", s"$path/total/output.dat", path)
   }
 
   /*
@@ -265,11 +276,10 @@ trait Coverage extends ChiselScalatestTester {
     createInfoFile()
 
     // Generate the actual html report
-    val percentage = generateHtmlReport()
+    val percentage = CoverageUtils.getCoverageReport(coverageFolder)
     println(s"Total coverage was: $percentage% $coverageFolder/total/index.html")
     count += 1
     outcome
   }
 
 }
-
