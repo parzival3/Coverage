@@ -1,0 +1,17 @@
+# SystemC::Coverage-3
+C 'fAlu.vl2n16pagev_toggle/AluoclockhTOP.Alu' 5
+C 'fAlu.vl3n16pagev_toggle/AluoresethTOP.Alu' 2
+C 'fAlu.vl4n16pagev_toggle/Aluoio_fn[0]hTOP.Alu' 0
+C 'fAlu.vl4n16pagev_toggle/Aluoio_fn[1]hTOP.Alu' 2
+C 'fAlu.vl5n16pagev_toggle/Aluoio_a[0]hTOP.Alu' 0
+C 'fAlu.vl5n16pagev_toggle/Aluoio_a[1]hTOP.Alu' 2
+C 'fAlu.vl5n16pagev_toggle/Aluoio_a[2]hTOP.Alu' 0
+C 'fAlu.vl5n16pagev_toggle/Aluoio_a[3]hTOP.Alu' 0
+C 'fAlu.vl6n16pagev_toggle/Aluoio_b[0]hTOP.Alu' 2
+C 'fAlu.vl6n16pagev_toggle/Aluoio_b[1]hTOP.Alu' 0
+C 'fAlu.vl6n16pagev_toggle/Aluoio_b[2]hTOP.Alu' 0
+C 'fAlu.vl6n16pagev_toggle/Aluoio_b[3]hTOP.Alu' 0
+C 'fAlu.vl7n16pagev_toggle/Aluoio_result[0]hTOP.Alu' 2
+C 'fAlu.vl7n16pagev_toggle/Aluoio_result[1]hTOP.Alu' 2
+C 'fAlu.vl7n16pagev_toggle/Aluoio_result[2]hTOP.Alu' 0
+C 'fAlu.vl7n16pagev_toggle/Aluoio_result[3]hTOP.Alu' 0
