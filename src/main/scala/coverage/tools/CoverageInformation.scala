@@ -6,7 +6,12 @@ import scala.collection.{immutable, mutable}
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
-class CoverageInformations {
+/**
+  * Class for parsing and generating coverage information
+  * TODO: This class can be easily transform into a pure functional class maybe splitted between a companion object
+  * and a class to store the information
+  */
+class CoverageInformation {
   var mnameMap:    mutable.HashMap[String, Int] = mutable.HashMap[String, Int]()
   var mpoints:     ArrayBuffer[Point] = new ArrayBuffer[Point]()
   var sources:     mutable.HashMap[String, VlSource] = new mutable.HashMap[String, VlSource]()
@@ -41,7 +46,7 @@ class CoverageInformations {
 
   class Point(val name: String, val pointNum: Int, var count: Int = 0) {
     /*
-     * Defined inside VlcPoint.h in verilator source file
+     * Defined inside VlcPoint.h in Verilator source file
      */
     val VL_CIK_FILENAME = "f"
     val VL_CIK_COMMENT = "o"
@@ -87,7 +92,11 @@ class CoverageInformations {
       count += num
     }
   }
-
+  // TODO: add bins coverage
+  /**
+    * This function creates the list of [[VlSource]]  by parsing the [[Point]] processed in the [[readCoverage]]
+    * function
+    */
   def annotatedCalc(): Unit = {
     mpoints.foreach { point =>
       val filename = point.filename.getOrElse("")
@@ -96,11 +105,16 @@ class CoverageInformations {
         val thresh = if (point.thresh == 0) annotateMin else point.thresh
         val ok = point.count > thresh
         curSource.incCount(point.linenum, point.linecol, point.count, ok)
-        // Missing for part for advance coverage
       }
     }
   }
 
+  /**
+    * Transform Dat file into info file
+    * @param fileName filename of info output file as String
+    * @param path path in which all the source file are stored. This path is then read by the genhtml tool to generate
+    *             a report with a link to the source code.
+    */
   def writeInfo(fileName: String, path: String): Unit = {
     val file = new File(fileName)
     val bufferString = new BufferedWriter(new FileWriter(file))
@@ -132,6 +146,10 @@ class CoverageInformations {
     bufferString.close()
   }
 
+  /**
+    * Read coverage from dat file
+    * @param fileName dat file to be parsed
+    */
   def readCoverage(fileName: String): Unit = {
     val lines: List[String] = Source.fromFile(fileName).getLines.toList
     lines.foreach { line =>
