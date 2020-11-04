@@ -1,42 +1,25 @@
 package org.scalatest.tools
-import java.net.URL
 
-import org.scalatest.events.{Event, Summary}
-import org.scalatest._
-import org.scalatest.events._
-import HtmlReporter._
-import java.io.BufferedOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.OutputStream
-import java.io.OutputStreamWriter
-import java.io.PrintWriter
-import java.io.StringWriter
+import java.io._
 import java.net.URL
 import java.nio.channels.Channels
 import java.text.DecimalFormat
-import java.util.Iterator
-import java.util.Set
 import java.util.UUID
-import org.scalatest.exceptions.StackDepth
-import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
-import scala.io.Source
-import scala.xml.Node
-import scala.xml.NodeBuffer
-import scala.xml.NodeSeq
-import scala.xml.XML
-import PrintReporter.BufferSize
-import StringReporter.makeDurationString
-import Suite.unparsedXml
-import Suite.xmlContent
-import org.scalatest.exceptions.TestFailedException
 
-import com.vladsch.flexmark.profiles.pegdown.Extensions
-import com.vladsch.flexmark.profiles.pegdown.PegdownOptionsAdapter
-import com.vladsch.flexmark.parser.Parser
+import chiseluvm.Coverage
 import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.profiles.pegdown.{Extensions, PegdownOptionsAdapter}
+import org.scalatest.Suite.{unparsedXml, xmlContent}
+import org.scalatest.events._
+import org.scalatest.exceptions.{StackDepth, TestFailedException}
+import org.scalatest.tools.HtmlReporter._
+import org.scalatest.tools.PrintReporter.BufferSize
+import org.scalatest.tools.StringReporter.makeDurationString
+import org.scalatest.{exceptions, ResourcefulReporter, Resources, Suite}
+
+import scala.collection.mutable.ListBuffer
+import scala.xml.{NodeBuffer, NodeSeq, XML}
 
 /**
   * A <code>Reporter</code> that prints test status information in HTML format to a file.
@@ -44,7 +27,7 @@ import com.vladsch.flexmark.html.HtmlRenderer
 private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
   val directoryPath:       String = "output"
   val presentAllDurations: Boolean = true
-  val cssUrl:              Option[URL] = Some(new URL("file:./src/resources/css/styles.css"))
+  val cssUrl:              Option[URL] = Some(classOf[Coverage].getClassLoader.getResource("css/styles.css"))
   val resultHolder:        Option[SuiteResultHolder] = Some(new SuiteResultHolder)
 
   private val specIndent = 15
@@ -1358,22 +1341,4 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
   // "  {0}" comes out as "{0}", so I can't do indenting in a localizable way. For now
   // just indent two space to the left.  //  if (times <= 0) s
   //  else Resources.indentOnce(indent(s, times - 1))
-}
-
-private[tools] object HtmlReporter {
-  final val SUCCEEDED_BIT = 1
-  final val FAILED_BIT = 2
-  final val IGNORED_BIT = 4
-  final val PENDING_BIT = 8
-  final val CANCELED_BIT = 16
-
-  def convertSingleParaToDefinition(html: String): String = {
-    val firstOpenPara = html.indexOf("<p>")
-    if (firstOpenPara == 0 && html.indexOf("<p>", 1) == -1 && html.indexOf("</p>") == html.length - 4)
-      html.replace("<p>", "<dl>\n<dt>").replace("</p>", "</dt>\n</dl>")
-    else html
-  }
-
-  def convertAmpersand(html: String): String =
-    html.replaceAll("&", "&amp;")
 }
