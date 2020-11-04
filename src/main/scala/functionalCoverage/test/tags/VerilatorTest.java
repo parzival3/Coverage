@@ -1,4 +1,4 @@
-package coverage.test.tags;
+package functionalCoverage.test.tags;
 import java.lang.annotation.*;
 import org.scalatest.TagAnnotation;
 

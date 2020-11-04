@@ -1,15 +1,15 @@
-package coverage
+package functionalCoverage
 import java.io.File
 import chiseltest.ChiselScalatestTester
 import chiseltest.experimental.sanitizeFileName
 import com.googlecode.jgenhtml.{Config, CoverageReport}
-import coverage.tools.FileUtils._
-import coverage.tools.CoverageInformation
+import functionalCoverage.tools.FileUtils._
+import functionalCoverage.tools.CoverageInformation
 import org.scalatest.{Outcome, TestSuite}
 
 import scala.sys.process._
 
-trait Coverage extends ChiselScalatestTester {
+trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
   private val simulationRoot = "test_run_dir"
   private val coverageBase = "coverage"

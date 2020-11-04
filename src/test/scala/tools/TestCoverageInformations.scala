@@ -1,6 +1,6 @@
 package tools
 
-import coverage.tools.CoverageInformation
+import functionalCoverage.tools.CoverageInformation
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.sys.process._

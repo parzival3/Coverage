@@ -42,7 +42,7 @@ resolvers ++= Seq(
 )
 
 lazy val root = (project in file(".")).dependsOn(chisel_tester2)
-lazy val chisel_tester2 = RootProject(uri("https://github.com/ryan-lund/chisel-testers2.git"))
+lazy val chisel_tester2 = RootProject(uri("https://github.com/ucb-bar/chisel-testers2.git"))
 
 libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.2.0"
 

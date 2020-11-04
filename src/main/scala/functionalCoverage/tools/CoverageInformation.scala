@@ -1,4 +1,4 @@
-package coverage.tools
+package functionalCoverage.tools
 
 import java.io.{BufferedWriter, File, FileWriter}
 

@@ -1,4 +1,4 @@
-package coverage.tools
+package functionalCoverage.tools
 
 import java.io.{File, IOException}
 import java.nio.file.{DirectoryNotEmptyException, FileAlreadyExistsException, Files, NoSuchFileException, Paths}

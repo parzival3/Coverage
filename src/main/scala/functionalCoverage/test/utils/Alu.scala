@@ -1,13 +1,13 @@
-package coverage.test.utils
+package functionalCoverage.test.utils
 
 import chisel3._
 import chisel3.util._
 
 class Alu(size: Int) extends Module {
   val io = IO(new Bundle {
-    val fn: UInt = Input(UInt(2.W))
-    val a: UInt = Input(UInt(size.W))
-    val b: UInt = Input(UInt(size.W))
+    val fn:     UInt = Input(UInt(2.W))
+    val a:      UInt = Input(UInt(size.W))
+    val b:      UInt = Input(UInt(size.W))
     val result: UInt = Output(UInt(size.W))
   })
 

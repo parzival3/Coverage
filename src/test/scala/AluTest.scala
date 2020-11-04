@@ -7,9 +7,9 @@ import chiseltest.internal.{
   ToggleCoverageAnnotation,
   VerilatorBackendAnnotation
 }
-import coverage.Coverage
-import coverage.test.tags.VerilatorTest
-import coverage.test.utils.Alu
+import functionalCoverage.CoverageTrait
+import functionalCoverage.test.tags.VerilatorTest
+import functionalCoverage.test.utils.Alu
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 
@@ -71,13 +71,30 @@ trait AluBehavior {
   }
 }
 
-class AluTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+class AluTestWrong extends AnyFlatSpec with ChiselScalatestTester with Matchers {
   behavior.of("ALU")
 
   def mask(s: Int): Int = (1 << 4) - 1
 
   val result = (2 + 1) & mask(4)
   it should "test static circuits" in {
+    test(new Alu(4)) { c =>
+      c.io.fn.poke(1.U)
+      c.io.a.poke(2.U(4.W))
+      c.io.b.poke(1.U(4.W))
+      c.clock.step()
+      c.io.result.expect(result.U(5.W))
+    }
+  }
+}
+
+class AluTestIgnored extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+  behavior.of("ALU")
+
+  def mask(s: Int): Int = (1 << 4) - 1
+
+  val result = (2 + 1) & mask(4)
+  ignore should "test static circuits" in {
     test(new Alu(4)) { c =>
       c.io.fn.poke(2.U)
       c.io.a.poke(2.U(4.W))
@@ -89,7 +106,7 @@ class AluTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
 }
 
 @VerilatorTest
-class AluTestVerilator extends AnyFlatSpec with Coverage with ChiselScalatestTester with Matchers {
+class AluTestVerilator extends AnyFlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
   behavior.of("ALU")
 
   def mask(s: Int): Int = (1 << 4) - 1
