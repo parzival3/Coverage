@@ -1,10 +1,10 @@
-package coverage
+package chiseluvm
 import java.io.File
 import chiseltest.ChiselScalatestTester
 import chiseltest.experimental.sanitizeFileName
 import com.googlecode.jgenhtml.{Config, CoverageReport}
-import coverage.tools.FileUtils._
-import coverage.tools.CoverageInformation
+import chiseluvm.tools.FileUtils._
+import chiseluvm.tools.CoverageInformation
 import org.scalatest.{Outcome, TestSuite}
 
 import scala.sys.process._
@@ -12,7 +12,7 @@ import scala.sys.process._
 trait Coverage extends ChiselScalatestTester {
   this: TestSuite =>
   private val simulationRoot = "test_run_dir"
-  private val coverageBase = "coverage"
+  private val coverageBase = "chiseluvm"
   private val verilogCovOutputPath = "logs"
   private val unifiedInfoFile = "output.info"
   private val unifiedDatFile = "output.dat"

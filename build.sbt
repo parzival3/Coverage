@@ -1,4 +1,4 @@
-name := "Coverage"
+name := "chisel-uvm"
 
 version := "0.1"
 
@@ -42,7 +42,7 @@ resolvers ++= Seq(
 )
 
 lazy val root = (project in file(".")).dependsOn(chisel_tester2)
-lazy val chisel_tester2 = RootProject(uri("https://github.com/ryan-lund/chisel-testers2.git"))
+lazy val chisel_tester2 = RootProject(uri("https://github.com/ucb-bar/chisel-testers2.git"))
 
 libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.2.0"
 
@@ -60,10 +60,6 @@ libraryDependencies ++= defaultVersions.map {
   case (dep, ver) =>
     "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", ver)
 }
-
-libraryDependencies ++= Seq(
-  "org.choco-solver" % "choco-solver" % "4.10.2"
-)
 
 libraryDependencies ++= Seq(
   "com.vladsch.flexmark" % "flexmark-all" % "0.35.10"
