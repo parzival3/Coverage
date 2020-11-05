@@ -11,8 +11,9 @@ import scala.sys.process._
 
 trait Coverage extends ChiselScalatestTester {
   this: TestSuite =>
+  private val base = "output"
   private val simulationRoot = "test_run_dir"
-  private val coverageBase = "chiseluvm"
+  private val coverageBase = base + File.separator + "chiseluvm"
   private val verilogCovOutputPath = "logs"
   private val unifiedInfoFile = "output.info"
   private val unifiedDatFile = "output.dat"
@@ -131,7 +132,7 @@ trait Coverage extends ChiselScalatestTester {
     * @return the outcome of the test
     */
   abstract override def withFixture(test: NoArgTest): Outcome = {
-
+    makeFolder(base)
     initializeDirectory(test)
 
     // Run the actual test

@@ -504,7 +504,7 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
             <tr id="suite_footer_coverage">
               <td id={transformStringForResult("suite_footer_coverage_label", suiteResult)}><a href={
       // TODO: Please remove the coverage folder and remove the coverage row if coverage is not present
-      "../" + coverageBase + File.separator + suiteResult.suiteId + "/html/index.html"
+      coverageBase + File.separator + suiteResult.suiteId + "/html/index.html"
     }> Total coverage</a></td>
               <td id="suite_footer_coverage_value" colspan="2"> 100
               </td>
@@ -642,6 +642,7 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
     val decimalFormat = new DecimalFormat("#.##")
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
       <head>
+        <base href="./" />
         <title>Chisel UVM Framework</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="Expires" content="-1" />
