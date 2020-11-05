@@ -34,7 +34,15 @@ jobs:
 
     - name: CodeCov
       run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_SECRET }}
+
+    # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
+    - name: Change base-tag in index.html from / to Caelicus
+      run: sed -i 's/<base href="\/" \/>/<base href="\/Coverage\/" \/>/g' output/index.html
       
+      # copy index.html to 404.html to serve the same file when a file is not found
+    - name: copy index.html to 404.html
+      run: cp output/index.html output/404.html
+
     - name: Commit output to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.5.9
       with:
