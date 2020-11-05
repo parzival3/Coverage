@@ -34,3 +34,10 @@ jobs:
 
     - name: CodeCov
       run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_SECRET }}
+      
+    - name: Commit output to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.5.9
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: output
