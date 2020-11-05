@@ -2,9 +2,9 @@ name: Scala CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -17,5 +17,20 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: create sbt directory
+      run: mkdir -p ~/.sbt/1.0
+
+    - name: install Verilator
+      run: sudo apt-get install verilator
+
+    - name: add Artima repository
+      run: echo "resolvers += \"Artima Maven Repository\" at \"http://repo.artima.com/releases\"" > ~/.sbt/1.0/global.sbt
+
     - name: Run tests
-      run: sbt test
+      run:  sbt clean coverage test
+
+    - name: Create Coverage Report
+      run: sbt coverageReport
+
+    - name: CodeCov
+      run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_SECRET }}
