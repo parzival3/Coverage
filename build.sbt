@@ -1,3 +1,4 @@
+
 name := "chisel-uvm"
 
 version := "0.1"
@@ -41,6 +42,7 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("releases")
 )
 
+// TODO: Remove this after new release of tester-2
 lazy val root = (project in file(".")).dependsOn(chisel_tester2)
 lazy val chisel_tester2 = RootProject(uri("https://github.com/ucb-bar/chisel-testers2.git"))
 
@@ -70,3 +72,5 @@ scalacOptions ++= Seq("-deprecation", "-feature", "-language:reflectiveCalls")
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-C", "org.scalatest.tools.CoverageHtmlReporter")
+coverageAggregate := true
+coverageEnabled := true

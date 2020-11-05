@@ -35,6 +35,8 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
   private val imagesDir = new File(targetDir, "images")
   private val jsDir = new File(targetDir, "js")
   private val cssDir = new File(targetDir, "css")
+  // TODO: should we get this from sbt?
+  private val coverageBase = "chiseluvm"
 
   if (!targetDir.exists)
     targetDir.mkdirs()
@@ -502,7 +504,7 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
             <tr id="suite_footer_coverage">
               <td id={transformStringForResult("suite_footer_coverage_label", suiteResult)}><a href={
       // TODO: Please remove the coverage folder and remove the coverage row if coverage is not present
-      "../coverage/" + suiteResult.suiteId + "/html/index.html"
+      "../" + coverageBase + File.separator + suiteResult.suiteId + "/html/index.html"
     }> Total coverage</a></td>
               <td id="suite_footer_coverage_value" colspan="2"> 100
               </td>

@@ -16,7 +16,7 @@ trait Coverage extends ChiselScalatestTester {
   private val verilogCovOutputPath = "logs"
   private val unifiedInfoFile = "output.info"
   private val unifiedDatFile = "output.dat"
-  private val coverageFolder = coverageBase + File.separator + suiteName
+  private val coverageFolder = coverageBase + File.separator + suiteId
   private var firstRun = true
   private var testRunDir = ""
   private def unifiedCovPath:   String = coverageFolder + File.separator + "total"
