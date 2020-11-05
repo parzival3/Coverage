@@ -35,8 +35,7 @@ jobs:
     - name: CodeCov
       run: bash <(curl -s https://codecov.io/bash) -t ${{ secrets.CODECOV_SECRET }}
 
-    # changes the base-tag in index.html from '/' to 'BlazorGitHubPagesDemo' to match GitHub Pages repository subdirectory
-    - name: Change base-tag in index.html from / to Caelicus
+    - name: Change base-tag in index.html from / to Coverage
       run: sed -i 's/<base href="\/" \/>/<base href="\/Coverage\/" \/>/g' output/index.html
       
       # copy index.html to 404.html to serve the same file when a file is not found
