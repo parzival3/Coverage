@@ -97,11 +97,14 @@ class CoverageInformation {
     * This function creates the list of [[VlSource]]  by parsing the [[Point]] processed in the [[readCoverage]]
     * function
     */
-  def annotatedCalc(): Unit = {
+  def annotatedCalc(runDir: String): Unit = {
     mpoints.foreach { point =>
       val filename = point.filename.getOrElse("")
       if (filename != "" && point.linenum != 0) {
-        val curSource = sources.getOrElseUpdate(filename, new VlSource(filename))
+        val relativeFilename = filename.substring(filename.lastIndexOf(runDir + File.pathSeparator))
+        println("###############################################################################################")
+        println(relativeFilename)
+        val curSource = sources.getOrElseUpdate(relativeFilename, new VlSource(relativeFilename))
         val thresh = if (point.thresh == 0) annotateMin else point.thresh
         val ok = point.count > thresh
         curSource.incCount(point.linenum, point.linecol, point.count, ok)
@@ -115,11 +118,11 @@ class CoverageInformation {
     * @param path path in which all the source file are stored. This path is then read by the genhtml tool to generate
     *             a report with a link to the source code.
     */
-  def writeInfo(fileName: String, path: String): Unit = {
+  def writeInfo(fileName: String, path: String, runDir: String): Unit = {
     val file = new File(fileName)
     val bufferString = new BufferedWriter(new FileWriter(file))
 
-    annotatedCalc()
+    annotatedCalc(runDir)
 
     bufferString.write("TN:verilator_coverage\n")
     sources.foreach { si =>

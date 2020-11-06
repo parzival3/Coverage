@@ -9,7 +9,7 @@ import org.scalatest.{Outcome, TestSuite}
 
 import scala.sys.process._
 
-trait Coverage extends ChiselScalatestTester {
+trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
   private val base = "output"
   private val simulationRoot = "test_run_dir"
@@ -90,7 +90,7 @@ trait Coverage extends ChiselScalatestTester {
   def createInfoFile(outputFolder: String, sourceFolder: String, datFile: String, infoFile: String): Unit = {
     val cover = new CoverageInformation
     cover.readCoverage(outputFolder + File.separator + datFile)
-    cover.writeInfo(outputFolder + File.separator + infoFile, sourceFolder)
+    cover.writeInfo(outputFolder + File.separator + infoFile, sourceFolder, testRunDir)
   }
 
   def initializeDirectory(test: NoArgTest): Unit = {

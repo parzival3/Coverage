@@ -6,7 +6,7 @@ import java.nio.channels.Channels
 import java.text.DecimalFormat
 import java.util.UUID
 
-import chiseluvm.Coverage
+import chiseluvm.CoverageTrait
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.profiles.pegdown.{Extensions, PegdownOptionsAdapter}
@@ -27,7 +27,7 @@ import scala.xml.{NodeBuffer, NodeSeq, XML}
 private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
   val directoryPath:       String = "output"
   val presentAllDurations: Boolean = true
-  val cssUrl:              Option[URL] = Some(classOf[Coverage].getClassLoader.getResource("css/styles.css"))
+  val cssUrl:              Option[URL] = Some(classOf[CoverageTrait].getClassLoader.getResource("css/styles.css"))
   val resultHolder:        Option[SuiteResultHolder] = Some(new SuiteResultHolder)
 
   private val specIndent = 15
