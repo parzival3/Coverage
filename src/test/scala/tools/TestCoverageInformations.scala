@@ -16,6 +16,6 @@ class TestCoverageInformations extends AnyFunSuite {
     var filename = "src/test/resources/output.dat"
     val cover = new CoverageInformation
     cover.readCoverage(filename)
-    cover.writeInfo("src/test/resources/out_info.info", "scr/test/resources/")
+    cover.writeInfo("src/test/resources/out_info.info", "scr/test/resources/", "./")
   }
 }
