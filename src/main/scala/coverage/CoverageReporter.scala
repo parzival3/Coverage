@@ -4,11 +4,9 @@ package coverage
 
 import chisel3.tester.testableData
 import coverage.Coverage._
-import scalatags.Text
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scalatags.Text.all._
 
 import scala.xml.Elem
 
