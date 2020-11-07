@@ -101,9 +101,13 @@ class CoverageInformation {
     mpoints.foreach { point =>
       val filename = point.filename.getOrElse("")
       if (filename != "" && point.linenum != 0) {
-        val relativeFilename = filename.substring(filename.lastIndexOf(runDir + File.pathSeparator))
-        println("###############################################################################################")
-        println(relativeFilename)
+        // TODO: the combined dat file uses relative path for some files and full paths for others
+        //  the relativeFilename variable here is just a way of overcome this limitation. I should rewrite the
+        //  write option of verilator_coverage in scala
+        var relativeFilename = filename
+        if (filename.lastIndexOf(runDir + File.pathSeparator)!= -1) {
+          relativeFilename = filename.substring(filename.lastIndexOf(runDir + File.pathSeparator))
+        }
         val curSource = sources.getOrElseUpdate(relativeFilename, new VlSource(relativeFilename))
         val thresh = if (point.thresh == 0) annotateMin else point.thresh
         val ok = point.count > thresh
