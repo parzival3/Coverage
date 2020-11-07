@@ -509,6 +509,14 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
               <td id="suite_footer_coverage_value" colspan="2"> 100
               </td>
           </tr>
+        <tr id="suite_footer_coverage">
+          <td id={transformStringForResult("suite_footer_coverage_label", suiteResult)}><a href={
+                                                                                           // TODO: Please remove the coverage folder and remove the coverage row if coverage is not present
+                                                                                           coverageBase + File.separator + suiteResult.suiteId + "/coverageBin.html"
+                                                                                           }> Total coverage</a></td>
+          <td id="suite_footer_coverage_value" colspan="2"> 100
+          </td>
+        </tr>
         </table>
         <div id="printlink">(<a href={getSuiteFileName(suiteResult) + ".html"} target="_blank">Open {
       suiteResult.suiteName

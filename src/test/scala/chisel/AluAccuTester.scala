@@ -19,8 +19,7 @@ class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestT
 
   def testFun[T <: AluAccu](dut: T): Unit = {
 
-    val cr = new CoverageReporter
-    cr.register(
+    coverageReporter.register(
         //Declare CoverPoints
         CoverPoint(dut.io.accu , "accu", //CoverPoint 1
             Bins("lo10", 0 to 10)::Bins("First100", 0 to 100)::Nil)::
@@ -59,7 +58,7 @@ class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestT
       dut.clock.step()
       dut.io.accu.expect(toUInt(alu(a, b, fun)))
 
-      cr.sample()
+      coverageReporter.sample()
     }
 
     def test(values: Seq[Int]): Unit = {
@@ -81,7 +80,7 @@ class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestT
     test(randArgs)
 
     //Print coverage report
-    cr.printReport()
+    coverageReporter.printReport()
   }
 
 

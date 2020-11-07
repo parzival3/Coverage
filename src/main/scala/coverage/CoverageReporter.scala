@@ -4,18 +4,96 @@ package coverage
 
 import chisel3.tester.testableData
 import coverage.Coverage._
+import scalatags.Text
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import scalatags.Text.all._
 
-/**
-  * Handles everything related to functional coverage
-  * @param dut the DUT currently being tested
-  * @tparam T the type of the DUT
-  */
+import scala.xml.Elem
+
 class CoverageReporter {
     private val coverGroups: ArrayBuffer[CoverGroup] = new ArrayBuffer[CoverGroup]()
     private val coverageDB: CoverageDB = new CoverageDB
+
+
+    def writeHtmlReport(path: String): Unit = {
+        val file = new java.io.File(path + java.io.File.separator + "coverageBin.html")
+        val bw = new java.io.BufferedWriter(new java.io.FileWriter(file))
+        bw.write(reportHtml)
+        bw.close()
+    }
+
+    def reportHtml(): String = {
+        def body(): Elem = {
+          <html>
+          <head>
+              <link rel="stylesheet" href="css/styles.css"></link>
+          </head>
+              <body>
+                <div>
+                    {table()}
+                </div>
+              </body>
+          </html>
+        }
+
+        def table(): Elem = {
+            <table class="content-table">
+                <thead>
+                    <tr>
+                        <th colspan="5"><span style="font-weight:bold">Cover Points Report</span></th>
+                    </tr>
+                </thead>
+                {coverGroups.map(group => tableBody(group))}
+            </table>
+        }
+
+        def tableBody(group: CoverGroup): Elem = {
+            <tbody>
+              {tableHeader(group.id.toString())}
+              {group.points.map(point => portName(point.portName) ++ valuesHeaderHtml() ++
+                point.bins.map(bin => valuesHtml("Bin", bin.name, "", bin.range, coverageDB.getNHits(bin))))}
+            </tbody>
+        }
+
+        def tableHeader(id: String): Elem = {
+            <tr>
+                <td class="id-row" colspan="5"><span style="font-weight:bold">Group ID {id}</span>
+                </td>
+            </tr>
+        }
+
+        def portName(name: String): Elem = {
+            <tr>
+                <td colspan="3"><span style="font-weight:bold">Port Name</span></td>
+                <td class="port-name" colspan="2">{name}</td>
+            </tr>
+        }
+
+        def valuesHeaderHtml(): Elem = {
+            <tr>
+                <td><span style="font-weight:bold">Type</span></td>
+                <td><span style="font-weight:bold">Name </span></td>
+                <td><span style="font-weight:bold">Covering</span></td>
+                <td><span style="font-weight:bold">Range </span></td>
+                <td><span style="font-weight:bold">Hits</span></td>
+            </tr>
+        }
+
+        def valuesHtml(t: String, n: String, c: String, r: Range, h: BigInt): Elem = {
+            <tr>
+                <td>{t}</td>
+                <td>{n}</td>
+                <td>{c}</td>
+                <td>{r.toString()}</td>
+                <td>{h}</td>
+            </tr>
+        }
+
+        body().toString()
+    }
+
 
     /**
       * Makes a readable fucntional coverage report

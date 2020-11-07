@@ -1,16 +1,19 @@
 package chiseluvm
 import java.io.File
+
 import chiseltest.ChiselScalatestTester
 import chiseltest.experimental.sanitizeFileName
 import com.googlecode.jgenhtml.{Config, CoverageReport}
 import chiseluvm.tools.FileUtils._
 import chiseluvm.tools.CoverageInformation
+import coverage.CoverageReporter
 import org.scalatest.{Outcome, TestSuite}
 
 import scala.sys.process._
 
 trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
+  val coverageReporter = new CoverageReporter
   private val base = "output"
   private val simulationRoot = "test_run_dir"
   private val coverageBase = base + File.separator + "chiseluvm"
@@ -20,6 +23,7 @@ trait CoverageTrait extends ChiselScalatestTester {
   private val coverageFolder = coverageBase + File.separator + suiteId
   private var firstRun = true
   private var testRunDir = ""
+  private val cssFolder = coverageFolder + File.separator + "css"
   private def unifiedCovPath:   String = coverageFolder + File.separator + "total"
   private def verilogSources:   String = coverageFolder
   private def datFileFolder:    String = coverageFolder
@@ -139,6 +143,9 @@ trait CoverageTrait extends ChiselScalatestTester {
     val outcome = super.withFixture(test)
 
     createReport()
+    makeFolder(cssFolder)
+    copyResource(classOf[CoverageTrait].getClassLoader.getResource("css/styles.css"), new File(cssFolder), "styles.css")
+    coverageReporter.writeHtmlReport(coverageFolder)
 
     // return the test results
     outcome
