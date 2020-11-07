@@ -2,14 +2,14 @@ TN:verilator_coverage
 SF:output/chiseluvm/chisel.AluAccuTester/AluAccuChisel.v
 DA:38,500
 DA:2,16003
-DA:5,123410
+DA:5,123024
 DA:40,7000
 DA:4,12004
-DA:7,90125
+DA:7,89624
 DA:34,1
 DA:37,7500
 DA:36,8000
 DA:3,2
-DA:12,90125
+DA:12,89624
 DA:6,2
 end_of_record
