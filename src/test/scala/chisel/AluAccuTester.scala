@@ -1,17 +1,18 @@
 package chisel
 
+import chisel3.{fromIntToLiteral, fromIntToWidth}
+import chisel3.tester.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
+import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import chiseltest._
 import chisel3._
-import chisel3.util._
-import chiseltest.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
-import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import chiseluvm.CoverageTrait
+import testutils.Types._
 import coverage.Coverage.{Bins, CoverPoint}
 import coverage.CoverageReporter
+import testutils.{Alu, AluAccu, AluAccuChisel, AluAccuGenerated}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
-import testutils.{AluAccu, AluAccuChisel, AluAccuGenerated}
-import testutils.Types._
 
 
 class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
@@ -84,11 +85,8 @@ class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestT
   }
 
 
-//  "AluAccuChisel" should "pass" in {
-//    test(new AluAccuChisel(32)){ dut => testFun(dut)}
-//  }
-
-  "AluAccuGenerated" should "pass" in {
-    test(new AluAccuGenerated(32)).withAnnotations(Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)) { dut => testFun(dut) }
+  "AluAccuChisel" should "pass" in {
+    test(new AluAccuChisel(32)).withAnnotations(Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)){ dut => testFun(dut)}
   }
+
 }
