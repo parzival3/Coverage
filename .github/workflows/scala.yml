@@ -17,8 +17,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: create sbt directory
-      run: mkdir -p ~/.sbt/1.0
+
+    - name: Download Snapshot of Tester2
+      run: git clone https://github.com/ucb-bar/chisel-testers2.git
+
+    - name: Publish Local Tester2
+      run: cd chisel-testers2 && sbt publishLocal
 
     - name: install Verilator
       run: sudo apt update && sudo apt-get install verilator
@@ -34,7 +38,7 @@ jobs:
 
     - name: Change base-tag in index.html from / to Coverage
       run: sed -i 's/<base href="\/" \/>/<base href="\/Coverage\/" \/>/g' output/index.html
-      
+
       # copy index.html to 404.html to serve the same file when a file is not found
     - name: copy index.html to 404.html
       run: cp output/index.html output/404.html

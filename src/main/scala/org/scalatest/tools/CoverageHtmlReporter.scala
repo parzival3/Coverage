@@ -345,44 +345,11 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
 
             nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_, "test_passed")).toList
 
-          case TestFailed(
-                ordinal,
-                message,
-                suiteName,
-                suiteId,
-                suiteClassName,
-                testName,
-                testText,
-                recordedEvents,
-                analysis,
-                throwable,
-                duration,
-                formatter,
-                location,
-                rerunnable,
-                payload,
-                threadName,
-                timeStamp
-              ) =>
-            val stringToPrint = stringsToPrintOnError(
-              Resources.failedNote,
-              Resources.testFailed _,
-              message,
-              throwable,
-              formatter,
-              Some(suiteName),
-              Some(testName),
-              duration
-            )
+          case TestFailed(ordinal, message, suiteName, suiteId, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
+
+            val stringToPrint = stringsToPrintOnError(Resources.failedNote, Resources.testFailed _, message, throwable, formatter, Some(suiteName), Some(testName), duration)
             val elementId = generateElementId
-            val nodeSeq = testWithDetails(
-              elementId,
-              List(stringToPrint),
-              message,
-              throwable,
-              getIndentLevel(formatter) + 1,
-              "test_failed"
-            )
+            val nodeSeq = testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")
 
             nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_, "test_failed")).toList
 
