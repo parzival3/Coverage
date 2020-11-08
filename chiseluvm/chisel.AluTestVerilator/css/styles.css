@@ -684,22 +684,22 @@ iframe {
   margin: 25px 0;
   font-size: 0.9em;
   min-width: 400px;
-  border-radius: 5px 5px 0 0;
+  border-radius: 0px 0px 0 0;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 .id-row {
   text-align: center;
-  color: #009879;
+  color: #478747;
 }
 .port-name {
-  color: #009879;
+  color: #478747;
   text-align: center;
   font-size: 1.5em;
 }
 
 .content-table thead tr {
-  background-color: #009879;
+  background-color: #478747;
   color: #ffffff;
   text-align: center;
   font-weight: bold;
@@ -722,5 +722,5 @@ iframe {
   border-bottom: 1px solid #dddddd;
 }
 .content-table tbody tr:last-of-type {
-  border-bottom: 2px solid #009879
+  border-bottom: 2px solid #478747
 }
