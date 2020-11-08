@@ -4,8 +4,6 @@ package coverage
 
 import chisel3.tester.testableData
 import coverage.Coverage._
-
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 import scala.xml.Elem
@@ -18,7 +16,7 @@ class CoverageReporter {
     def writeHtmlReport(path: String): Unit = {
         val file = new java.io.File(path + java.io.File.separator + "coverageBin.html")
         val bw = new java.io.BufferedWriter(new java.io.FileWriter(file))
-        bw.write(reportHtml)
+        bw.write(reportHtml())
         bw.close()
     }
 
@@ -26,7 +24,9 @@ class CoverageReporter {
         def body(): Elem = {
           <html>
           <head>
-              <link rel="stylesheet" href="css/styles.css"></link>
+              <!-- Since the main frame create a view port is not easy to acces the "parent" style so I create a copy -->
+              <!-- in the css/ -->
+              <link rel="stylesheet" href="css/styles.css"/>
           </head>
               <body>
                 <div>
@@ -40,7 +40,7 @@ class CoverageReporter {
             <table class="content-table">
                 <thead>
                     <tr>
-                        <th colspan="5"><span style="font-weight:bold">Cover Points Report</span></th>
+                        <th colspan="4"><span style="font-weight:bold">Cover Groups Report</span></th>
                     </tr>
                 </thead>
                 {coverGroups.map(group => tableBody(group))}
@@ -51,13 +51,13 @@ class CoverageReporter {
             <tbody>
               {tableHeader(group.id.toString())}
               {group.points.map(point => portName(point.portName) ++ valuesHeaderHtml() ++
-                point.bins.map(bin => valuesHtml("Bin", bin.name, "", bin.range, coverageDB.getNHits(bin))))}
+                point.bins.map(bin => valuesHtml("Bin", bin.name, bin.range, coverageDB.getNHits(bin))))}
             </tbody>
         }
 
         def tableHeader(id: String): Elem = {
             <tr>
-                <td class="id-row" colspan="5"><span style="font-weight:bold">Group ID {id}</span>
+                <td class="id-row" colspan="4"><span style="font-weight:bold">Group ID {id}</span>
                 </td>
             </tr>
         }
@@ -73,17 +73,15 @@ class CoverageReporter {
             <tr>
                 <td><span style="font-weight:bold">Type</span></td>
                 <td><span style="font-weight:bold">Name </span></td>
-                <td><span style="font-weight:bold">Covering</span></td>
                 <td><span style="font-weight:bold">Range </span></td>
                 <td><span style="font-weight:bold">Hits</span></td>
             </tr>
         }
 
-        def valuesHtml(t: String, n: String, c: String, r: Range, h: BigInt): Elem = {
+        def valuesHtml(t: String, n: String, r: Range, h: BigInt): Elem = {
             <tr>
                 <td>{t}</td>
                 <td>{n}</td>
-                <td>{c}</td>
                 <td>{r.toString()}</td>
                 <td>{h}</td>
             </tr>

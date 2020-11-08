@@ -1,8 +1,10 @@
 package org.scalatest.tools
 
 import java.io._
+import java.nio.file.Paths
 import java.net.URL
 import java.nio.channels.Channels
+import java.nio.file.Files
 import java.text.DecimalFormat
 import java.util.UUID
 
@@ -16,10 +18,10 @@ import org.scalatest.exceptions.{StackDepth, TestFailedException}
 import org.scalatest.tools.HtmlReporter._
 import org.scalatest.tools.PrintReporter.BufferSize
 import org.scalatest.tools.StringReporter.makeDurationString
-import org.scalatest.{exceptions, ResourcefulReporter, Resources, Suite}
+import org.scalatest.{ResourcefulReporter, Resources, Suite, exceptions}
 
 import scala.collection.mutable.ListBuffer
-import scala.xml.{NodeBuffer, NodeSeq, XML}
+import scala.xml.{Elem, NodeBuffer, NodeSeq, XML}
 
 /**
   * A <code>Reporter</code> that prints test status information in HTML format to a file.
@@ -217,6 +219,24 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
 
   private def transformStringForResult(s: String, suiteResult: SuiteResult): String =
     s + (if (suiteResult.testsFailedCount > 0) "_failed" else "_passed")
+
+  private def insertVerilatorCoverage(id: String): Elem = {
+    val report = coverageBase + File.separator + id + "/html/index.html"
+    <tr>
+      <td> Verilator Coverage </td>
+      <td id="suite_footer_coverage_value" colspan="2"> <a href={report}>Report</a> </td>
+    </tr>
+  }
+
+  private def insertCoverGroupResults(id: String): Elem = {
+    val report = coverageBase + File.separator + id + "/coverageBin.html"
+    <tr id="suite_footer_coverage">
+      <td>Cover Groups Coverage</td>
+      <td id="suite_footer_coverage_value" colspan="2"><a href={report}>Report</a>
+      </td>
+    </tr>
+
+  }
 
   private def getSuiteHtml(name: String, suiteResult: SuiteResult) =
     <html>
@@ -501,22 +521,22 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
     }
             </td>
           </tr>
-            <tr id="suite_footer_coverage">
-              <td id={transformStringForResult("suite_footer_coverage_label", suiteResult)}><a href={
-      // TODO: Please remove the coverage folder and remove the coverage row if coverage is not present
-      coverageBase + File.separator + suiteResult.suiteId + "/html/index.html"
-    }> Total coverage</a></td>
-              <td id="suite_footer_coverage_value" colspan="2"> 100
-              </td>
-          </tr>
-        <tr id="suite_footer_coverage">
-          <td id={transformStringForResult("suite_footer_coverage_label", suiteResult)}><a href={
-                                                                                           // TODO: Please remove the coverage folder and remove the coverage row if coverage is not present
-                                                                                           coverageBase + File.separator + suiteResult.suiteId + "/coverageBin.html"
-                                                                                           }> Total coverage</a></td>
-          <td id="suite_footer_coverage_value" colspan="2"> 100
-          </td>
-        </tr>
+          <!-- Verilator Coverage Results
+          {
+                insertVerilatorCoverage(suiteResult.suiteId)
+          }
+          -->
+          <!-- CoverGroup Results -->
+          {
+            if (Files.exists(Paths.get("output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "/html/index.html"))) {
+              insertVerilatorCoverage(suiteResult.suiteId)
+            }
+          }
+          {
+            if (Files.exists(Paths.get("output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "coverageBin.html"))) {
+              insertCoverGroupResults(suiteResult.suiteId)
+            }
+          }
         </table>
         <div id="printlink">(<a href={getSuiteFileName(suiteResult) + ".html"} target="_blank">Open {
       suiteResult.suiteName
