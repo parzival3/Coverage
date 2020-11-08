@@ -1,11 +1,11 @@
 package tools
 
 import chiseluvm.tools.CoverageInformation
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 import scala.sys.process._
 
-class TestCoverageInformations extends AnyFunSuite {
+class TestCoverageInformations extends FunSuite {
   test("CoverageInfomations should be able to parse info file") {
     val filename = "src/test/resources/output.dat"
     val cover = new CoverageInformation

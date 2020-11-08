@@ -10,12 +10,11 @@ import chiseluvm.CoverageTrait
 import testutils.Types._
 import coverage.Coverage.{Bins, CoverPoint}
 import coverage.CoverageReporter
+import org.scalatest.{FlatSpec, Matchers}
 import testutils.{Alu, AluAccu, AluAccuChisel, AluAccuGenerated}
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers
 
 
-class AluAccuTester extends AnyFlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
+class AluAccuTester extends FlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
 
   def testFun[T <: AluAccu](dut: T): Unit = {
 

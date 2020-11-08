@@ -6,12 +6,11 @@ import chiseltest.{ChiselScalatestTester, testableClock, testableData}
 import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import chiseluvm.CoverageTrait
 import chiseluvm.test.tags.VerilatorTest
+import org.scalatest.{FlatSpec, Matchers}
 import testutils.Alu
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers
 
 @VerilatorTest
-class AluTestVerilator extends AnyFlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
+class AluTestVerilator extends FlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
   behavior.of("ALU")
 
   def mask(s: Int): Int = (1 << 4) - 1

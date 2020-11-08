@@ -1,10 +1,9 @@
 package tools
 
 import chiseluvm.CoverageTrait
-import org.scalatest.Suite
-import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.{FlatSpec, Suite}
 
-class TestResources extends AnyFlatSpec {
+class TestResources extends FlatSpec {
 
   "Resources" should "be available" in {
 

@@ -3,11 +3,10 @@ package chisel
 import chisel3.core.fromIntToWidth
 import chisel3.fromIntToLiteral
 import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import org.scalatest.{FlatSpec, Matchers}
 import testutils.Alu
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.must.Matchers
 
-class AluTest extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+class AluTest extends FlatSpec with ChiselScalatestTester with Matchers {
   behavior.of("ALU")
 
   def mask(s: Int): Int = (1 << 4) - 1

@@ -1,0 +1,9 @@
+TN:verilator_coverage
+SF:scr/test/resources//Alu.v
+DA:2,5
+DA:5,2
+DA:4,2
+DA:7,4
+DA:3,2
+DA:6,2
+end_of_record

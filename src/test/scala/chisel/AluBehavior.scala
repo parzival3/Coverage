@@ -4,11 +4,11 @@ import chisel3.{fromIntToLiteral, fromIntToWidth}
 import chiseltest.{ChiselScalatestTester, testableClock, testableData}
 import chiseltest.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
 import chiseltest.internal.TestOptionObject
+import org.scalatest.FlatSpec
 import testutils.Alu
-import org.scalatest.flatspec.AnyFlatSpec
 
 trait AluBehavior {
-  this: AnyFlatSpec with ChiselScalatestTester =>
+  this: FlatSpec with ChiselScalatestTester =>
 
   def mask(s: Int): Int = (1 << s) - 1
 
