@@ -2,23 +2,24 @@ package chisel
 import chisel3.fromBigIntToLiteral
 import chisel3.tester.testableClock
 import chiseltest.testableData
-import chiseluvm.classes.{uvm_analysis_port, uvm_driver, uvm_monitor, uvm_sequence, uvm_sequence_item, uvm_sequencer}
+import chiseluvm.classes._
 import coverage.Coverage.{Bins, CoverPoint}
 import testutils.Alu
 
-import scala.collection.mutable.ArrayBuffer
 import scala.math.BigInt
 import scala.util.Random
 
-class TestUVMAlu extends chiseluvm.classes.uvm_test {
+
+
+class TestUVMAlu extends uvm_test {
 
   case class simpleTransaction(inputA: BigInt, inputB: BigInt, inputOp: BigInt) extends uvm_sequence_item
 
-  class simpleAluSequence extends uvm_sequence[simpleTransaction] {
+  object simpleAluSequence extends uvm_sequence[simpleTransaction] {
     // TODO: replace with constraint random class
     val rand = Random
-    def body(): List[simpleTransaction] = {
-      for (i <- (0 to 15).toList) yield simpleTransaction(rand.nextInt(20), rand.nextInt(20), rand.nextInt(5))
+    def body(): Stream[simpleTransaction] = {
+      (for (i <- (0 to 15).toList) yield simpleTransaction(rand.nextInt(20), rand.nextInt(20), rand.nextInt(5))).toStream
     }
   }
 
@@ -29,11 +30,13 @@ class TestUVMAlu extends chiseluvm.classes.uvm_test {
 
   class simpleAdluDriver(alu: Alu) extends uvm_driver[simpleTransaction] {
     override def runPhase(): Unit = {
-      val transaction = seqItemPort.getNextItem(simpleTransaction(10, 10, 1))
-      alu.io.a.poke(transaction.inputA.U)
-      alu.io.b.poke(transaction.inputB.U)
-      alu.io.fn.poke(transaction.inputOp.U)
-      alu.clock.step()
+      if (simpleAluSequence.body().nonEmpty) {
+        val transaction = simpleAluSequence.body().iterator.next()
+        alu.io.a.poke(transaction.inputA.U)
+        alu.io.b.poke(transaction.inputB.U)
+        alu.io.fn.poke(transaction.inputOp.U)
+        alu.clock.step()
+      }
     }
   }
 
@@ -43,8 +46,25 @@ class TestUVMAlu extends chiseluvm.classes.uvm_test {
     }
 
     override def runPhase(): Unit = {
+      val a = alu.io.a.peek().litValue()
+      val b = alu.io.b.peek().litValue()
+      val fun = alu.io.fn.peek().litValue()
+      val sum = BigInt(0)
+      val sub = BigInt(1)
+      val or = BigInt(2)
+      val and = BigInt(3)
 
+      val out = fun match {
+        case `sum` => a + b
+        case `sub` => a - b
+        case `or` => a | b
+        case `and` => a & b
+      }
+
+      val currentTransaction = simpleTransaction(a, b, out)
+      portBefor.write(currentTransaction)
     }
+
   }
 
   class monitorAfter(alu: Alu) extends uvm_monitor {
@@ -76,7 +96,39 @@ class TestUVMAlu extends chiseluvm.classes.uvm_test {
       portAfter.write(currentTransaction)
 
     }
-
   }
 
+  class simpleAluAgent(alu: Alu) extends uvm_agent {
+    val sequencer = new simpleAluSequencer
+    val driver = new simpleAdluDriver(alu)
+    val monitor_b = new monitorBefore(alu)
+    val monitor_a = new monitorAfter(alu)
+
+    def run(): Unit = {
+
+    }
+  }
+
+  class simpleAluScoreboard extends uvm_scoreboard {
+    def run(): Unit = {
+      assert(portBefor.transactions.last == portAfter.transactions.last)
+    }
+  }
+
+  class simpleEnv(alu: Alu) extends uvm_environment {
+    val agent = new simpleAluAgent(alu)
+    val scoreboard = new simpleAluScoreboard
+    def run(): Unit = {
+      agent.run()
+    }
+  }
+
+  "UVM test" should "work" in {
+    val dut = new Alu(16)
+    val simpleAdderEnv = new simpleEnv(dut)
+
+    test(dut) {alu =>
+
+    }
+  }
 }
