@@ -32,15 +32,15 @@ object GoldenModel {
 class TestUVMAlu extends uvm_test {
 
   class simpleTransaction() extends sv.Random(20) with uvm_sequence_item {
-    var inputA: RandInt = 0
-    var inputB: RandInt = 0
-    var inputOp: RandInt = 0
+    var inputA: RandInt = rand(inputA, 0 to 255 toList)
+    var inputB: RandInt = rand(inputB, 0 to 255 toList)
+    var inputOp: RandInt = rand(inputOp, 0 to 10 toList)
 
     var output: BigInt = 0
 
-    rand(inputA, 0 to 255 toList)
-    rand(inputB, 0 to 255 toList)
-    rand(inputOp, 0 to 3 toList)
+    val constraintOP: ConstraintBlock = constraintBlock(
+      unary (inputOp => inputOp <= 3)
+    )
 
     override def equals(that: Any): Boolean = {
       that match {
@@ -112,6 +112,7 @@ class TestUVMAlu extends uvm_test {
       currentTransaction.inputB = b
       currentTransaction.inputOp = fun
       currentTransaction.output = GoldenModel.prediction(a, b, fun)
+
       coverageReporter.sample()
       portAfter.write(currentTransaction)
 
@@ -134,7 +135,7 @@ class TestUVMAlu extends uvm_test {
     def run(): Unit = {
       println("Port Before ==========================")
       println(portBefor.transactions.last.debug())
-      println("Port After ==========================")
+      println("Port After  ==========================")
       println(portAfter.transactions.last.debug())
       assert(portBefor.transactions.last == portAfter.transactions.last)
     }
@@ -153,6 +154,8 @@ class TestUVMAlu extends uvm_test {
 
     test(new Alu(8)).withAnnotations(VerilatorCoverage) {alu =>
       val simpleAdderEnv = new simpleEnv(alu)
+      simpleAdderEnv.run()
+      simpleAdderEnv.run()
       simpleAdderEnv.run()
       simpleAdderEnv.run()
       simpleAdderEnv.run()
