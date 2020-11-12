@@ -13,7 +13,8 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "com.googlecode.jgenhtml" % "jgenhtml" % "1.5",
   "com.vladsch.flexmark" % "flexmark-all" % "0.35.10",
-  "edu.berkeley.cs" % "chiseltest_2.12" % "0.3-SNAPSHOT"
+  "edu.berkeley.cs" % "chiseltest_2.12" % "0.3-SNAPSHOT",
+  "csp" % "csp_2.12" % "0.2"
 )
 
 testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-C", "org.scalatest.tools.CoverageHtmlReporter")

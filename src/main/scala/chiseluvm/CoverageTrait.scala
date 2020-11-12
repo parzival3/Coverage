@@ -1,8 +1,10 @@
 package chiseluvm
 import java.io.File
+import java.nio.file.{Files, Paths}
 
 import chiseltest.ChiselScalatestTester
 import chiseltest.experimental.sanitizeFileName
+import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import com.googlecode.jgenhtml.{Config, CoverageReport}
 import chiseluvm.tools.FileUtils._
 import chiseluvm.tools.CoverageInformation
@@ -14,6 +16,7 @@ import scala.sys.process._
 trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
   val coverageReporter = new CoverageReporter
+  val VerilatorCoverage = Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)
   private val base = "output"
   private val simulationRoot = "test_run_dir"
   private val coverageBase = base + File.separator + "chiseluvm"
@@ -111,7 +114,7 @@ trait CoverageTrait extends ChiselScalatestTester {
     }
   }
 
-  def createReport(): Unit = {
+  def createVerilogReport(): Unit = {
 
     // Copy the data generated in the test directory to the current test suite coverage directory
     copyVerilogFile(testRunDir, coverageFolder)
@@ -137,12 +140,17 @@ trait CoverageTrait extends ChiselScalatestTester {
     */
   abstract override def withFixture(test: NoArgTest): Outcome = {
     makeFolder(base)
+
     initializeDirectory(test)
 
     // Run the actual test
     val outcome = super.withFixture(test)
 
-    createReport()
+    // Check if the test produced Verilog coverage results
+    if (Files.exists(Paths.get(testDirDatFolder))) {
+      createVerilogReport()
+    }
+
     makeFolder(cssFolder)
     copyResource(classOf[CoverageTrait].getClassLoader.getResource("css/styles.css"), new File(cssFolder), "styles.css")
     coverageReporter.writeHtmlReport(coverageFolder)

@@ -24,6 +24,12 @@ jobs:
     - name: Publish Local Tester2
       run: cd chisel-testers2 && sbt publishLocal
 
+    - name: Download Snapshot of CSP
+      run: git clone https://github.com/parzival3/csp.git
+
+    - name: Publish Local csp
+      run: cd csp && sbt publishLocal
+
     - name: install Verilator
       run: sudo apt update && sudo apt-get install verilator
 
