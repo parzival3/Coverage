@@ -10,12 +10,15 @@ import chiseluvm.tools.FileUtils._
 import chiseluvm.tools.CoverageInformation
 import coverage.CoverageReporter
 import org.scalatest.{Outcome, TestSuite}
+import classes._
 
 import scala.sys.process._
 
 trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
   val coverageReporter = new CoverageReporter
+
+
   val VerilatorCoverage = Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)
   private val base = "output"
   private val simulationRoot = "test_run_dir"

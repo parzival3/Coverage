@@ -4,6 +4,6 @@ import chiseltest.ChiselScalatestTester
 import chiseluvm.CoverageTrait
 import org.scalatest.FlatSpec
 
-trait uvm_test extends FlatSpec with CoverageTrait with ChiselScalatestTester {
+trait uvm_test extends FlatSpec with CoverageTrait with ChiselScalatestTester with uvm_object {
 
 }

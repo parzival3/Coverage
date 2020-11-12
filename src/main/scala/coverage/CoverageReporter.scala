@@ -12,7 +12,6 @@ class CoverageReporter {
     private val coverGroups: ArrayBuffer[CoverGroup] = new ArrayBuffer[CoverGroup]()
     private val coverageDB: CoverageDB = new CoverageDB
 
-
     def writeHtmlReport(path: String): Unit = {
         val file = new java.io.File(path + java.io.File.separator + "coverageBin.html")
         val bw = new java.io.BufferedWriter(new java.io.FileWriter(file))
@@ -52,6 +51,8 @@ class CoverageReporter {
               {tableHeader(group.id.toString())}
               {group.points.map(point => portName(point.portName) ++ valuesHeaderHtml() ++
                 point.bins.map(bin => valuesHtml("Bin", bin.name, bin.range, coverageDB.getNHits(bin))))}
+              {group.crosses.map(cross => crossPort(cross.name, cross.pointName1, cross.pointName2) ++ valuesHeaderHtml() ++
+              cross.bins.map(bin => valuesCrossHtml("Bin", bin.name, bin.range1, bin.range2, coverageDB.getNHits(bin))))}
             </tbody>
         }
 
@@ -62,10 +63,27 @@ class CoverageReporter {
             </tr>
         }
 
+        def crossPort(name: String, port1: String, port2: String): Elem = {
+            <tr>
+                <td colspan="3"><span style="font-weight:bold">Cross Point {name}</span></td>
+                <td class="port-name" colspan="2">For Points {port1} and {port2}</td>
+            </tr>
+        }
+
         def portName(name: String): Elem = {
             <tr>
                 <td colspan="3"><span style="font-weight:bold">Port Name</span></td>
                 <td class="port-name" colspan="2">{name}</td>
+            </tr>
+        }
+
+        def crossTableHeader(): Elem = {
+            <tr>
+                <td><span style="font-weight:bold">Type</span></td>
+                <td><span style="font-weight:bold">Name </span></td>
+                <td><span style="font-weight:bold">Range 1</span></td>
+                <td><span style="font-weight:bold">Range 2</span></td>
+                <td><span style="font-weight:bold">Hits</span></td>
             </tr>
         }
 
@@ -75,6 +93,16 @@ class CoverageReporter {
                 <td><span style="font-weight:bold">Name </span></td>
                 <td><span style="font-weight:bold">Range </span></td>
                 <td><span style="font-weight:bold">Hits</span></td>
+            </tr>
+        }
+
+        def valuesCrossHtml(t: String, n: String, r: Range, r2: Range,  h: BigInt): Elem = {
+            <tr>
+                <td>{t}</td>
+                <td>{n}</td>
+                <td>{r.toString()}</td>
+                <td>{r2.toString()}</td>
+                <td>{h}</td>
             </tr>
         }
 

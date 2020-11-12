@@ -1,6 +1,6 @@
 package chiseluvm.classes
 
-trait uvm_driver[T] {
+trait uvm_driver[T] extends uvm_object {
   def runPhase(): Unit
 
   object seqItemPort {

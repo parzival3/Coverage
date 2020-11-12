@@ -5,12 +5,14 @@ import chisel3.tester.testableClock
 import chiseltest.testableData
 import chiseluvm.classes._
 import coverage.Coverage.{Bins, CoverPoint}
+import coverage.CoverageReporter
 import sv.Random.RandInt
+import sv.Random
 import testutils.Alu
 
 import scala.language.postfixOps
 import scala.math.BigInt
-import scala.util.Random
+
 
 object GoldenModel {
 
@@ -29,131 +31,128 @@ object GoldenModel {
   }
 }
 
+class Transaction() extends Random(20) with uvm_sequence_item {
+  var inputA: RandInt = rand(inputA, 0 to 255 toList)
+  var inputB: RandInt = rand(inputB, 0 to 255 toList)
+  var inputOp: RandInt = rand(inputOp, 0 to 10 toList)
+  var output: BigInt = 0
+
+  val constraintOP: ConstraintBlock = constraintBlock(
+    unary (inputOp => inputOp <= 3)
+  )
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case transaction: Transaction => {
+        inputA == transaction.inputA && inputB == transaction.inputB && inputOp == transaction.inputOp && output == transaction.output
+      }
+      case _ => false
+    }
+  }
+}
+
+object AluSequence extends uvm_sequence[Transaction] {
+  val iterator: Iterator[Transaction] = new Iterator[Transaction] {
+    var i: Int = -1
+    val pendingT = new Transaction()
+    def hasNext(): Boolean = pendingT.randomize
+    def next(): Transaction = {
+      i += 1
+      pendingT
+    }
+  }
+}
+
+object portAfter extends uvm_analysis_port[Transaction]
+object portBefor extends uvm_analysis_port[Transaction]
+
+class AdluDriver(alu: Alu) extends uvm_driver[Transaction] {
+  override def runPhase(): Unit = {
+    if (AluSequence.iterator.hasNext) {
+      val transaction = AluSequence.iterator.next()
+      alu.io.a.poke(transaction.inputA.U)
+      alu.io.b.poke(transaction.inputB.U)
+      alu.io.fn.poke(transaction.inputOp.U)
+      alu.clock.step()
+    }
+  }
+}
+
+class MonitorBefore(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
+
+  override def runPhase(): Unit = {
+    val a = alu.io.a.peek().litValue()
+    val b = alu.io.b.peek().litValue()
+    val fun = alu.io.fn.peek().litValue()
+    val currentTransaction = new Transaction
+    currentTransaction.inputA = a
+    currentTransaction.inputB = b
+    currentTransaction.inputOp = fun
+    currentTransaction.output = alu.io.result.peek().litValue()
+    portBefor.write(currentTransaction)
+  }
+
+}
+
+class MonitorAfter(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
+  reporter.register(
+    CoverPoint(alu.io.a , "ioa", Bins("lo10", 0 to 10)::Nil)::CoverPoint(alu.io.b, "iob", Bins("lo10", 0 to 10)::Nil)::Nil
+  )
+
+  override def runPhase(): Unit = {
+
+    val a = alu.io.a.peek().litValue()
+    val b = alu.io.b.peek().litValue()
+    val fun = alu.io.fn.peek().litValue()
+
+    val currentTransaction = new Transaction
+    currentTransaction.inputA = a
+    currentTransaction.inputB = b
+    currentTransaction.inputOp = fun
+    currentTransaction.output = GoldenModel.prediction(a, b, fun)
+
+    reporter.sample()
+    portAfter.write(currentTransaction)
+
+  }
+}
+
+class AluAgent(alu: Alu, reporter: CoverageReporter) extends uvm_agent {
+  val driver = new AdluDriver(alu)
+  val monitor_b = new MonitorBefore(alu, reporter)
+  val monitor_a = new MonitorAfter(alu, reporter)
+
+  def run(): Unit = {
+    driver.runPhase()
+    monitor_a.runPhase()
+    monitor_b.runPhase()
+  }
+}
+
+class AluScoreboard extends uvm_scoreboard {
+  def run(): Unit = {
+    println("Transaction in Port Before ==========================")
+    println(portBefor.transactions.last.debug())
+    println("Transaction in Port After  ==========================")
+    println(portAfter.transactions.last.debug())
+    assert(portBefor.transactions.last == portAfter.transactions.last)
+  }
+}
+
+class AluEnv(alu: Alu, reporter: CoverageReporter) extends uvm_environment {
+  val agent = new AluAgent(alu, reporter)
+  val scoreboard = new AluScoreboard
+  def run(): Unit = {
+    agent.run()
+    scoreboard.run()
+  }
+}
+
 class TestUVMAlu extends uvm_test {
-
-  class simpleTransaction() extends sv.Random(20) with uvm_sequence_item {
-    var inputA: RandInt = rand(inputA, 0 to 255 toList)
-    var inputB: RandInt = rand(inputB, 0 to 255 toList)
-    var inputOp: RandInt = rand(inputOp, 0 to 10 toList)
-
-    var output: BigInt = 0
-
-    val constraintOP: ConstraintBlock = constraintBlock(
-      unary (inputOp => inputOp <= 3)
-    )
-
-    override def equals(that: Any): Boolean = {
-      that match {
-        case transaction: simpleTransaction => {
-          inputA == transaction.inputA && inputB == transaction.inputB && inputOp == transaction.inputOp && output == transaction.output
-        }
-        case _ => false
-      }
-    }
-  }
-
-  object simpleAluSequence extends uvm_sequence[simpleTransaction] {
-    val iterator: Iterator[simpleTransaction] = new Iterator[simpleTransaction] {
-      var i: Int = -1
-      val pendingT = new simpleTransaction()
-      def hasNext(): Boolean = pendingT.randomize
-      def next(): simpleTransaction = {
-        i += 1
-        pendingT
-      }
-    }
-  }
-
-  object portAfter extends uvm_analysis_port[simpleTransaction]
-  object portBefor extends uvm_analysis_port[simpleTransaction]
-
-  class simpleAdluDriver(alu: Alu) extends uvm_driver[simpleTransaction] {
-    override def runPhase(): Unit = {
-      if (simpleAluSequence.iterator.hasNext) {
-        val transaction = simpleAluSequence.iterator.next()
-        println(transaction.debug())
-        alu.io.a.poke(transaction.inputA.U)
-        alu.io.b.poke(transaction.inputB.U)
-        alu.io.fn.poke(transaction.inputOp.U)
-        alu.clock.step()
-      }
-    }
-  }
-
-  class monitorBefore(alu: Alu) extends uvm_monitor {
-
-    override def runPhase(): Unit = {
-      val a = alu.io.a.peek().litValue()
-      val b = alu.io.b.peek().litValue()
-      val fun = alu.io.fn.peek().litValue()
-      val currentTransaction = new simpleTransaction
-      currentTransaction.inputA = a
-      currentTransaction.inputB = b
-      currentTransaction.inputOp = fun
-      currentTransaction.output = alu.io.result.peek().litValue()
-      portBefor.write(currentTransaction)
-    }
-
-  }
-
-  class monitorAfter(alu: Alu) extends uvm_monitor {
-    coverageReporter.register(
-      CoverPoint(alu.io.a , "ioa", Bins("lo10", 0 to 10)::Nil)::CoverPoint(alu.io.b, "iob", Bins("lo10", 0 to 10)::Nil)::Nil
-    )
-
-    override def runPhase(): Unit = {
-
-      val a = alu.io.a.peek().litValue()
-      val b = alu.io.b.peek().litValue()
-      val fun = alu.io.fn.peek().litValue()
-
-      val currentTransaction = new simpleTransaction
-      currentTransaction.inputA = a
-      currentTransaction.inputB = b
-      currentTransaction.inputOp = fun
-      currentTransaction.output = GoldenModel.prediction(a, b, fun)
-
-      coverageReporter.sample()
-      portAfter.write(currentTransaction)
-
-    }
-  }
-
-  class simpleAluAgent(alu: Alu) extends uvm_agent {
-    val driver = new simpleAdluDriver(alu)
-    val monitor_b = new monitorBefore(alu)
-    val monitor_a = new monitorAfter(alu)
-
-    def run(): Unit = {
-      driver.runPhase()
-      monitor_a.runPhase()
-      monitor_b.runPhase()
-    }
-  }
-
-  class simpleAluScoreboard extends uvm_scoreboard {
-    def run(): Unit = {
-      println("Port Before ==========================")
-      println(portBefor.transactions.last.debug())
-      println("Port After  ==========================")
-      println(portAfter.transactions.last.debug())
-      assert(portBefor.transactions.last == portAfter.transactions.last)
-    }
-  }
-
-  class simpleEnv(alu: Alu) extends uvm_environment {
-    val agent = new simpleAluAgent(alu)
-    val scoreboard = new simpleAluScoreboard
-    def run(): Unit = {
-      agent.run()
-      scoreboard.run()
-    }
-  }
-
   "UVM test" should "work" in {
 
     test(new Alu(8)).withAnnotations(VerilatorCoverage) {alu =>
-      val simpleAdderEnv = new simpleEnv(alu)
+      val simpleAdderEnv = new AluEnv(alu, coverageReporter)
       simpleAdderEnv.run()
       simpleAdderEnv.run()
       simpleAdderEnv.run()
