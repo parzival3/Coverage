@@ -52,9 +52,9 @@ class Transaction() extends Random(20) with uvm_sequence_item {
 }
 
 object AluSequence extends uvm_sequence[Transaction] {
+  val pendingT = new Transaction()
   val iterator: Iterator[Transaction] = new Iterator[Transaction] {
     var i: Int = -1
-    val pendingT = new Transaction()
     def hasNext(): Boolean = pendingT.randomize
     def next(): Transaction = {
       i += 1
