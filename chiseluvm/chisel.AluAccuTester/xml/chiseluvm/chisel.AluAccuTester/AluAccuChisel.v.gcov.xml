@@ -16,17 +16,17 @@
 <code>  input  [2:0]  io_op,</code>
 <hit count="12004" name="verilator_coverage"/>
 </line>
-<line hits="121910">
+<line hits="121114">
 <code>  input  [31:0] io_din,</code>
-<hit count="121910" name="verilator_coverage"/>
+<hit count="121114" name="verilator_coverage"/>
 </line>
 <line hits="2">
 <code>  input         io_ena,</code>
 <hit count="2" name="verilator_coverage"/>
 </line>
-<line hits="90114">
+<line hits="88272">
 <code>  output [31:0] io_accu</code>
-<hit count="90114" name="verilator_coverage"/>
+<hit count="88272" name="verilator_coverage"/>
 </line>
 <line>
 <code>);</code>
@@ -40,9 +40,9 @@
 <line>
 <code>`endif // RANDOMIZE_REG_INIT</code>
 </line>
-<line hits="90114">
+<line hits="88272">
 <code>  reg [31:0] a; // @[AluAccuChisel.scala 18:24]</code>
-<hit count="90114" name="verilator_coverage"/>
+<hit count="88272" name="verilator_coverage"/>
 </line>
 <line>
 <code>  wire  _T = 3'h0 == io_op; // @[Conditional.scala 37:30]</code>
