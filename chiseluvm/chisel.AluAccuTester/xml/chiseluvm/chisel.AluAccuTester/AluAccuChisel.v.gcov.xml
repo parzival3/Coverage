@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?xml-stylesheet type="text/xsl" href="../../jgenhtml.xsl"?><coverage branch-rate="NaN" branches-covered="0" branches-valid="0" complexity="0" date="2020-11-12" filename="AluAccuChisel.v" function-rate="NaN" functions-covered="0" functions-valid="0" line-rate="1.0" lines-covered="12" lines-valid="12" package="/chiseluvm/chisel.AluAccuTester" testname="output.info" version="1.5">
+<?xml-stylesheet type="text/xsl" href="../../jgenhtml.xsl"?><coverage branch-rate="NaN" branches-covered="0" branches-valid="0" complexity="0" date="2020-11-13" filename="AluAccuChisel.v" function-rate="NaN" functions-covered="0" functions-valid="0" line-rate="1.0" lines-covered="12" lines-valid="12" package="/chiseluvm/chisel.AluAccuTester" testname="output.info" version="1.5">
 <lines>
 <line>
 <code>module AluAccuChisel(</code>
@@ -16,17 +16,17 @@
 <code>  input  [2:0]  io_op,</code>
 <hit count="12004" name="verilator_coverage"/>
 </line>
-<line hits="119916">
+<line hits="119248">
 <code>  input  [31:0] io_din,</code>
-<hit count="119916" name="verilator_coverage"/>
+<hit count="119248" name="verilator_coverage"/>
 </line>
 <line hits="2">
 <code>  input         io_ena,</code>
 <hit count="2" name="verilator_coverage"/>
 </line>
-<line hits="90298">
+<line hits="87489">
 <code>  output [31:0] io_accu</code>
-<hit count="90298" name="verilator_coverage"/>
+<hit count="87489" name="verilator_coverage"/>
 </line>
 <line>
 <code>);</code>
@@ -40,9 +40,9 @@
 <line>
 <code>`endif // RANDOMIZE_REG_INIT</code>
 </line>
-<line hits="90298">
+<line hits="87489">
 <code>  reg [31:0] a; // @[AluAccuChisel.scala 18:24]</code>
-<hit count="90298" name="verilator_coverage"/>
+<hit count="87489" name="verilator_coverage"/>
 </line>
 <line>
 <code>  wire  _T = 3'h0 == io_op; // @[Conditional.scala 37:30]</code>
