@@ -40,7 +40,9 @@ jobs:
       run: sudo apt update && sudo apt-get install verilator
 
     - name: Run tests
-      run:  sbt clean coverage test
+      run: |
+        sbt clean coverage test
+        sbt test
 
     - name: Create Coverage Report
       run: sbt coverageReport
