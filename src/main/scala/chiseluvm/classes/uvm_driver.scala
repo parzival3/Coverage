@@ -1,13 +1,9 @@
 package chiseluvm.classes
 
 trait uvm_driver[T] extends uvm_object {
-  def runPhase(): Unit
+  var sequence: uvm_sequence[T] = new uvm_sequence[T] {}
 
-  object seqItemPort {
-
-    def getNextItem(seq: T): T = {
-     seq
-    }
+  def connectSequence(seq: uvm_sequence[T]): Unit = {
+    sequence = seq
   }
-
 }

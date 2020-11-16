@@ -31,7 +31,7 @@ object GoldenModel {
   }
 }
 
-class Transaction() extends Random(20) with uvm_sequence_item {
+class Transaction extends Random(20) with uvm_sequence_item {
   var inputA: RandInt = rand(inputA, 0 to 255 toList)
   var inputB: RandInt = rand(inputB, 0 to 255 toList)
   var inputOp: RandInt = rand(inputOp, 0 to 10 toList)
@@ -51,12 +51,12 @@ class Transaction() extends Random(20) with uvm_sequence_item {
   }
 }
 
-object AluSequence extends uvm_sequence[Transaction] {
+class AluSequence extends uvm_sequence[Transaction] {
   val pendingT = new Transaction()
-  val iterator: Iterator[Transaction] = new Iterator[Transaction] {
+  override val iterator: Iterator[Transaction] = new Iterator[Transaction] {
     var i: Int = -1
-    def hasNext(): Boolean = pendingT.randomize
-    def next(): Transaction = {
+    def hasNext: Boolean = pendingT.randomize
+    def next: Transaction = {
       i += 1
       pendingT
     }
@@ -67,20 +67,21 @@ object portAfter extends uvm_analysis_port[Transaction]
 object portBefor extends uvm_analysis_port[Transaction]
 
 class AdluDriver(alu: Alu) extends uvm_driver[Transaction] {
-  override def runPhase(): Unit = {
-    if (AluSequence.iterator.hasNext) {
-      val transaction = AluSequence.iterator.next()
+
+  override def run(): Unit = {
+    if (sequence.iterator.hasNext) {
+      val transaction = sequence.iterator.next()
       alu.io.a.poke(transaction.inputA.U)
       alu.io.b.poke(transaction.inputB.U)
       alu.io.fn.poke(transaction.inputOp.U)
-      alu.clock.step()
+      //alu.clock.step()
     }
   }
 }
 
 class MonitorBefore(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
 
-  override def runPhase(): Unit = {
+  override def run(): Unit = {
     val a = alu.io.a.peek().litValue()
     val b = alu.io.b.peek().litValue()
     val fun = alu.io.fn.peek().litValue()
@@ -99,7 +100,7 @@ class MonitorAfter(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
     CoverPoint(alu.io.a , "ioa", Bins("lo10", 0 to 10)::Nil)::CoverPoint(alu.io.b, "iob", Bins("lo10", 0 to 10)::Nil)::Nil
   )
 
-  override def runPhase(): Unit = {
+  override def run(): Unit = {
 
     val a = alu.io.a.peek().litValue()
     val b = alu.io.b.peek().litValue()
@@ -121,12 +122,9 @@ class AluAgent(alu: Alu, reporter: CoverageReporter) extends uvm_agent {
   val driver = new AdluDriver(alu)
   val monitor_b = new MonitorBefore(alu, reporter)
   val monitor_a = new MonitorAfter(alu, reporter)
+  val sequ = new AluSequence
 
-  def run(): Unit = {
-    driver.runPhase()
-    monitor_a.runPhase()
-    monitor_b.runPhase()
-  }
+  driver.connectSequence(sequ)
 }
 
 class AluScoreboard extends uvm_scoreboard {
@@ -139,13 +137,9 @@ class AluScoreboard extends uvm_scoreboard {
   }
 }
 
-class AluEnv(alu: Alu, reporter: CoverageReporter) extends uvm_environment {
+class AluEnv(val alu: Alu, reporter: CoverageReporter) extends uvm_environment {
   val agent = new AluAgent(alu, reporter)
   val scoreboard = new AluScoreboard
-  def run(): Unit = {
-    agent.run()
-    scoreboard.run()
-  }
 }
 
 class TestUVMAlu extends uvm_test {
@@ -153,11 +147,11 @@ class TestUVMAlu extends uvm_test {
 
     test(new Alu(8)).withAnnotations(VerilatorCoverage) {alu =>
       val simpleAdderEnv = new AluEnv(alu, coverageReporter)
-      simpleAdderEnv.run()
-      simpleAdderEnv.run()
-      simpleAdderEnv.run()
-      simpleAdderEnv.run()
-      simpleAdderEnv.run()
+      simpleAdderEnv.step()
+      simpleAdderEnv.step()
+      simpleAdderEnv.step()
+      simpleAdderEnv.step()
+      simpleAdderEnv.step()
     }
   }
 }
