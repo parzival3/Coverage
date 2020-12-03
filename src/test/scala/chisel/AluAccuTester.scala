@@ -2,7 +2,7 @@ package chisel
 
 import chisel3.{fromIntToLiteral, fromIntToWidth}
 import chisel3.tester.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
-import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import chiseltest.{testableClock, testableData, ChiselScalatestTester}
 import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import chiseltest._
 import chisel3._
@@ -13,20 +13,23 @@ import coverage.CoverageReporter
 import org.scalatest.{FlatSpec, Matchers}
 import testutils.{Alu, AluAccu, AluAccuChisel, AluAccuGenerated}
 
-
 class AluAccuTester extends FlatSpec with CoverageTrait with ChiselScalatestTester with Matchers {
 
   def testFun[T <: AluAccu](dut: T): Unit = {
 
     coverageReporter.register(
-        //Declare CoverPoints
-        CoverPoint(dut.io.accu , "accu", //CoverPoint 1
-            Bins("lo10", 0 to 10)::Bins("First100", 0 to 100)::Nil)::
-       // CoverPoint(dut.io.test, "test", //CoverPoint 2
-       //     Bins("testLo10", 0 to 10)::Nil)::
-        Nil)
-        //Declare cross points
-        /*Cross("accuAndTest", "accu", "test",
+      //Declare CoverPoints
+      CoverPoint(
+        dut.io.accu,
+        "accu", //CoverPoint 1
+        Bins("lo10", 0 to 10) :: Bins("First100", 0 to 100) :: Nil
+      ) ::
+        // CoverPoint(dut.io.test, "test", //CoverPoint 2
+        //     Bins("testLo10", 0 to 10)::Nil)::
+        Nil
+    )
+    //Declare cross points
+    /*Cross("accuAndTest", "accu", "test",
             CrossBin("both1", 1 to 1, 1 to 1)::Nil)::
         Nil)*/
 
@@ -82,9 +85,11 @@ class AluAccuTester extends FlatSpec with CoverageTrait with ChiselScalatestTest
     coverageReporter.printReport()
   }
 
-
   "AluAccuChisel" should "pass" in {
-    test(new AluAccuChisel(32)).withAnnotations(Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)){ dut => testFun(dut)}
+    test(new AluAccuChisel(32))
+      .withAnnotations(Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)) { dut =>
+        testFun(dut)
+      }
   }
 
 }

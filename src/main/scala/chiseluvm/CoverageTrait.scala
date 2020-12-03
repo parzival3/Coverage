@@ -18,7 +18,6 @@ trait CoverageTrait extends ChiselScalatestTester {
   this: TestSuite =>
   val coverageReporter = new CoverageReporter
 
-
   val VerilatorCoverage = Seq(VerilatorBackendAnnotation, ToggleCoverageAnnotation, LineCoverageAnnotation)
   private val base = "output"
   private val simulationRoot = "test_run_dir"
@@ -131,8 +130,9 @@ trait CoverageTrait extends ChiselScalatestTester {
     createInfoFile(unifiedCovPath, verilogSources, unifiedDatFile, unifiedInfoFile)
 
     // Generate the actual html report
-    val percentage = getCoverageReport(coverageFolder)
-    println(s"Total coverage was: $percentage% $coverageFolder/total/index.html")
+    // val percentage = getCoverageReport(coverageFolder)
+    getCoverageReport(coverageFolder)
+    println(s"Coverage saved in $coverageFolder/total/index.html")
     // Return the outcome of the test
   }
 

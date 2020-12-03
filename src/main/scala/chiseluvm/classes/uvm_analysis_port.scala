@@ -8,7 +8,5 @@ trait uvm_analysis_port[T] extends uvm_object {
     transactions += transaction
   }
 
-  override def run(): Unit = {
-
-  }
+  override def run(): Unit = {}
 }

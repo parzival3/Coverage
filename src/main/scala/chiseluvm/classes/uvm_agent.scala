@@ -7,7 +7,7 @@ trait uvm_agent extends uvm_object {
   private val rm = runtimeMirror(getClass.getClassLoader)
   private val im = rm.reflect(this)
   private val members = im.symbol.typeSignature.members
-  private def drivers: Iterable[universe.Symbol] = members.filter(_.typeSignature <:< typeOf[uvm_driver[_]])
+  private def drivers:  Iterable[universe.Symbol] = members.filter(_.typeSignature <:< typeOf[uvm_driver[_]])
   private def monitors: Iterable[universe.Symbol] = members.filter(_.typeSignature <:< typeOf[uvm_monitor])
 
   def run(): Unit = {

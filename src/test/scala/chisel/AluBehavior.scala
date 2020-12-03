@@ -1,7 +1,7 @@
 package chisel
 
 import chisel3.{fromIntToLiteral, fromIntToWidth}
-import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import chiseltest.{testableClock, testableData, ChiselScalatestTester}
 import chiseltest.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
 import chiseltest.internal.TestOptionObject
 import org.scalatest.FlatSpec

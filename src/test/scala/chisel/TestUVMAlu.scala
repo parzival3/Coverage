@@ -13,7 +13,6 @@ import testutils.Alu
 import scala.language.postfixOps
 import scala.math.BigInt
 
-
 object GoldenModel {
 
   def prediction(a: BigInt, b: BigInt, c: BigInt): BigInt = {
@@ -25,20 +24,20 @@ object GoldenModel {
     c match {
       case `sum` => a + b
       case `sub` => a - b
-      case `or` => a | b
+      case `or`  => a | b
       case `and` => a & b
     }
   }
 }
 
 class Transaction extends Random(20) with uvm_sequence_item {
-  var inputA: RandInt = rand(inputA, 0 to 255 toList)
-  var inputB: RandInt = rand(inputB, 0 to 255 toList)
+  var inputA:  RandInt = rand(inputA, 0 to 255 toList)
+  var inputB:  RandInt = rand(inputB, 0 to 255 toList)
   var inputOp: RandInt = rand(inputOp, 0 to 10 toList)
-  var output: BigInt = 0
+  var output:  BigInt = 0
 
   val constraintOP: ConstraintBlock = constraintBlock(
-    unary (inputOp => inputOp <= 3)
+    unary(inputOp => inputOp <= 3)
   )
 
   override def equals(that: Any): Boolean = {
@@ -54,7 +53,7 @@ class Transaction extends Random(20) with uvm_sequence_item {
 class AluSequence extends uvm_sequence[Transaction] {
   val pendingT = new Transaction()
   override val iterator: Iterator[Transaction] = new Iterator[Transaction] {
-    var i: Int = -1
+    var i:       Int = -1
     def hasNext: Boolean = pendingT.randomize
     def next: Transaction = {
       i += 1
@@ -97,7 +96,11 @@ class MonitorBefore(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
 
 class MonitorAfter(alu: Alu, reporter: CoverageReporter) extends uvm_monitor {
   reporter.register(
-    CoverPoint(alu.io.a , "ioa", Bins("lo10", 0 to 10)::Nil)::CoverPoint(alu.io.b, "iob", Bins("lo10", 0 to 10)::Nil)::Nil
+    CoverPoint(alu.io.a, "ioa", Bins("lo10", 0 to 10) :: Nil) :: CoverPoint(
+      alu.io.b,
+      "iob",
+      Bins("lo10", 0 to 10) :: Nil
+    ) :: Nil
   )
 
   override def run(): Unit = {
@@ -145,7 +148,7 @@ class AluEnv(val alu: Alu, reporter: CoverageReporter) extends uvm_environment {
 class TestUVMAlu extends uvm_test {
   "UVM test" should "work" in {
 
-    test(new Alu(8)).withAnnotations(VerilatorCoverage) {alu =>
+    test(new Alu(8)).withAnnotations(VerilatorCoverage) { alu =>
       val simpleAdderEnv = new AluEnv(alu, coverageReporter)
       simpleAdderEnv.step()
       simpleAdderEnv.step()

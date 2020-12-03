@@ -41,7 +41,7 @@ class AluAccuChisel(size: Int) extends AluAccu(size) {
     is(xor) {
       res := a ^ b
     }
-    is (shr) {
+    is(shr) {
       res := a >> 1
     }
     is(ld) {
@@ -49,7 +49,7 @@ class AluAccuChisel(size: Int) extends AluAccu(size) {
     }
   }
 
-  when (io.ena) {
+  when(io.ena) {
     accuReg := res
   }
 

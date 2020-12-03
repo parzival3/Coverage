@@ -1,13 +1,13 @@
 package vivadoex1
 
-import Chisel.{Cat, fromIntToWidth, fromtIntToLiteral}
+import Chisel.{fromIntToWidth, fromtIntToLiteral, Cat}
 import chisel3.tester.{testableClock, testableData}
 import chisel3.util.{is, switch}
 import chisel3.{Bundle, Input, Module, Output, UInt, Wire}
 import chiseluvm.classes.uvm_test
 
 class HalfAdder extends Module {
-  val io = IO(new Bundle{
+  val io = IO(new Bundle {
     val x: UInt = Input(UInt(1.W))
     val y: UInt = Input(UInt(1.W))
     val s: UInt = Output(UInt(1.W))
@@ -23,7 +23,7 @@ class HalfAdder extends Module {
 }
 
 class FullAdder extends Module {
-  val io = IO(new Bundle{
+  val io = IO(new Bundle {
     val x = Input(UInt(1.W))
     val y = Input(UInt(1.W))
     val cin = Input(UInt(1.W))
@@ -44,7 +44,7 @@ class FullAdder extends Module {
 }
 
 class Adder4Bit extends Module {
-  val io = IO(new Bundle{
+  val io = IO(new Bundle {
     val x = Input(UInt(4.W))
     val y = Input(UInt(4.W))
     val cin = Input(UInt(1.W))
@@ -82,21 +82,21 @@ class Adder4Bit extends Module {
 }
 
 class Adder4BitTest extends uvm_test {
- "HalfAdderTest" should "sum" in {
-   test(new HalfAdder) { adder =>
-     adder.io.x.poke(1.U)
-     adder.io.y.poke(0.U)
-     adder.clock.step()
-     adder.io.s.expect(1.U)
-     adder.io.c.equals(0.U)
-     //----------------------
-     adder.io.x.poke(1.U)
-     adder.io.y.poke(1.U)
-     adder.clock.step()
-     adder.io.s.expect(0.U)
-     adder.io.c.equals(1.U)
-   }
- }
+  "HalfAdderTest" should "sum" in {
+    test(new HalfAdder) { adder =>
+      adder.io.x.poke(1.U)
+      adder.io.y.poke(0.U)
+      adder.clock.step()
+      adder.io.s.expect(1.U)
+      adder.io.c.equals(0.U)
+      //----------------------
+      adder.io.x.poke(1.U)
+      adder.io.y.poke(1.U)
+      adder.clock.step()
+      adder.io.s.expect(0.U)
+      adder.io.c.equals(1.U)
+    }
+  }
 
   "Full Adder" should "sum" in {
     test(new FullAdder) { adder =>
@@ -124,7 +124,7 @@ class Adder4BitTest extends uvm_test {
   }
 
   "4BitAdder" should "sum" in {
-    test(new Adder4Bit){adder =>
+    test(new Adder4Bit) { adder =>
       adder.io.x.poke(4.U)
       adder.io.y.poke(4.U)
       adder.io.cin.poke(0.U)

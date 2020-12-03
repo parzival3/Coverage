@@ -21,7 +21,7 @@ class ReferenceModel {
 
     if (otrans.x + otrans.y + otrans.cin > 15) {
       otrans.cout = 1
-      otrans.sum =  (ctrans.x + ctrans.y + ctrans.cin) - 16
+      otrans.sum = (ctrans.x + ctrans.y + ctrans.cin) - 16
     } else {
       otrans.cout = 0
       otrans.sum = ctrans.x + ctrans.y + ctrans.cin
@@ -30,12 +30,11 @@ class ReferenceModel {
   }
 }
 
-
 class Transaction extends Random(30) with uvm_sequence_item {
-  var x: RandInt = rand(x, 0 to 15 toList)
-  var y: RandInt = rand(y, 0 to 15 toList)
-  var cin: RandInt = rand(cin, 0x0 to 1 toList)
-  var sum: BigInt = 0
+  var x:    RandInt = rand(x, 0 to 15 toList)
+  var y:    RandInt = rand(y, 0 to 15 toList)
+  var cin:  RandInt = rand(cin, 0x0 to 1 toList)
+  var sum:  BigInt = 0
   var cout: BigInt = 0
 
 }
@@ -43,7 +42,7 @@ class Transaction extends Random(30) with uvm_sequence_item {
 class Sequence extends uvm_sequence[Transaction] {
   val pendingT = new Transaction()
   override def iterator: Iterator[Transaction] = new Iterator[Transaction] {
-    var i: Int = -1
+    var i:       Int = -1
     def hasNext: Boolean = pendingT.randomize
     def next: Transaction = {
       i += 1
@@ -54,7 +53,7 @@ class Sequence extends uvm_sequence[Transaction] {
 
 class Driver(adder: Adder4Bit, report: CoverageReporter) extends uvm_driver[Transaction] {
   override def run(): Unit = {
-    if(sequence.iterator.hasNext) {
+    if (sequence.iterator.hasNext) {
       val transaction = sequence.iterator.next()
       println(transaction.debug())
       adder.io.x.poke(transaction.x.U)
@@ -109,7 +108,6 @@ class Environment(val adder: Adder4Bit, reporter: CoverageReporter) extends uvm_
     sc.run()
   }
 }
-
 
 class AdderUvmTest extends uvm_test {
 

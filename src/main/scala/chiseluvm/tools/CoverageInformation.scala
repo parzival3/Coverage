@@ -105,7 +105,7 @@ class CoverageInformation {
         //  the relativeFilename variable here is just a way of overcome this limitation. I should rewrite the
         //  write option of verilator_coverage in scala
         var relativeFilename = filename
-        if (filename.lastIndexOf(runDir + File.pathSeparator)!= -1) {
+        if (filename.lastIndexOf(runDir + File.pathSeparator) != -1) {
           relativeFilename = filename.substring(filename.lastIndexOf(runDir + File.pathSeparator))
         }
         val curSource = sources.getOrElseUpdate(relativeFilename, new VlSource(relativeFilename))

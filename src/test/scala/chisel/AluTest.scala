@@ -2,7 +2,7 @@ package chisel
 
 import chisel3.core.fromIntToWidth
 import chisel3.fromIntToLiteral
-import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import chiseltest.{testableClock, testableData, ChiselScalatestTester}
 import org.scalatest.{FlatSpec, Matchers}
 import testutils.Alu
 

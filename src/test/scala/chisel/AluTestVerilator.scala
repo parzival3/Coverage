@@ -2,7 +2,7 @@ package chisel
 
 import chisel3.{fromIntToLiteral, fromIntToWidth}
 import chisel3.tester.experimental.TestOptionBuilder.ChiselScalatestOptionBuilder
-import chiseltest.{ChiselScalatestTester, testableClock, testableData}
+import chiseltest.{testableClock, testableData, ChiselScalatestTester}
 import chiseltest.internal.{LineCoverageAnnotation, ToggleCoverageAnnotation, VerilatorBackendAnnotation}
 import chiseluvm.CoverageTrait
 import chiseluvm.test.tags.VerilatorTest

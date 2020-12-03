@@ -9,19 +9,19 @@ import scala.collection.mutable.ArrayBuffer
 import scala.xml.Elem
 
 class CoverageReporter {
-    private val coverGroups: ArrayBuffer[CoverGroup] = new ArrayBuffer[CoverGroup]()
-    private val coverageDB: CoverageDB = new CoverageDB
+  private val coverGroups: ArrayBuffer[CoverGroup] = new ArrayBuffer[CoverGroup]()
+  private val coverageDB:  CoverageDB = new CoverageDB
 
-    def writeHtmlReport(path: String): Unit = {
-        val file = new java.io.File(path + java.io.File.separator + "coverageBin.html")
-        val bw = new java.io.BufferedWriter(new java.io.FileWriter(file))
-        bw.write(reportHtml())
-        bw.close()
-    }
+  def writeHtmlReport(path: String): Unit = {
+    val file = new java.io.File(path + java.io.File.separator + "coverageBin.html")
+    val bw = new java.io.BufferedWriter(new java.io.FileWriter(file))
+    bw.write(reportHtml())
+    bw.close()
+  }
 
-    def reportHtml(): String = {
-        def body(): Elem = {
-          <html>
+  def reportHtml(): String = {
+    def body(): Elem = {
+      <html>
           <head>
               <!-- Since the main frame create a view port is not easy to acces the "parent" style so I create a copy -->
               <!-- in the css/ -->
@@ -33,10 +33,10 @@ class CoverageReporter {
                 </div>
               </body>
           </html>
-        }
+    }
 
-        def table(): Elem = {
-            <table class="content-table">
+    def table(): Elem = {
+      <table class="content-table">
                 <thead>
                     <tr>
                         <th colspan="4"><span style="font-weight:bold">Cover Groups Report</span></th>
@@ -44,183 +44,190 @@ class CoverageReporter {
                 </thead>
                 {coverGroups.map(group => tableBody(group))}
             </table>
-        }
+    }
 
-        def tableBody(group: CoverGroup): Elem = {
-            <tbody>
+    def tableBody(group: CoverGroup): Elem = {
+      <tbody>
               {tableHeader(group.id.toString())}
-              {group.points.map(point => portName(point.portName) ++ valuesHeaderHtml() ++
-                point.bins.map(bin => valuesHtml("Bin", bin.name, bin.range, coverageDB.getNHits(bin))))}
-              {group.crosses.map(cross => crossPort(cross.name, cross.pointName1, cross.pointName2) ++ valuesHeaderHtml() ++
-              cross.bins.map(bin => valuesCrossHtml("Bin", bin.name, bin.range1, bin.range2, coverageDB.getNHits(bin))))}
+              {
+        group.points.map(point =>
+          portName(point.portName) ++ valuesHeaderHtml() ++
+            point.bins.map(bin => valuesHtml("Bin", bin.name, bin.range, coverageDB.getNHits(bin)))
+        )
+      }
+              {
+        group.crosses.map(cross =>
+          crossPort(cross.name, cross.pointName1, cross.pointName2) ++ valuesHeaderHtml() ++
+            cross.bins.map(bin => valuesCrossHtml("Bin", bin.name, bin.range1, bin.range2, coverageDB.getNHits(bin)))
+        )
+      }
             </tbody>
-        }
+    }
 
-        def tableHeader(id: String): Elem = {
-            <tr>
+    def tableHeader(id: String): Elem = {
+      <tr>
                 <td class="id-row" colspan="4"><span style="font-weight:bold">Group ID {id}</span>
                 </td>
             </tr>
-        }
+    }
 
-        def crossPort(name: String, port1: String, port2: String): Elem = {
-            <tr>
+    def crossPort(name: String, port1: String, port2: String): Elem = {
+      <tr>
                 <td colspan="3"><span style="font-weight:bold">Cross Point {name}</span></td>
                 <td class="port-name" colspan="2">For Points {port1} and {port2}</td>
             </tr>
-        }
+    }
 
-        def portName(name: String): Elem = {
-            <tr>
+    def portName(name: String): Elem = {
+      <tr>
                 <td colspan="3"><span style="font-weight:bold">Port Name</span></td>
                 <td class="port-name" colspan="2">{name}</td>
             </tr>
-        }
+    }
 
-        def crossTableHeader(): Elem = {
-            <tr>
+    def crossTableHeader(): Elem = {
+      <tr>
                 <td><span style="font-weight:bold">Type</span></td>
                 <td><span style="font-weight:bold">Name </span></td>
                 <td><span style="font-weight:bold">Range 1</span></td>
                 <td><span style="font-weight:bold">Range 2</span></td>
                 <td><span style="font-weight:bold">Hits</span></td>
             </tr>
-        }
+    }
 
-        def valuesHeaderHtml(): Elem = {
-            <tr>
+    def valuesHeaderHtml(): Elem = {
+      <tr>
                 <td><span style="font-weight:bold">Type</span></td>
                 <td><span style="font-weight:bold">Name </span></td>
                 <td><span style="font-weight:bold">Range </span></td>
                 <td><span style="font-weight:bold">Hits</span></td>
             </tr>
-        }
+    }
 
-        def valuesCrossHtml(t: String, n: String, r: Range, r2: Range,  h: BigInt): Elem = {
-            <tr>
+    def valuesCrossHtml(t: String, n: String, r: Range, r2: Range, h: BigInt): Elem = {
+      <tr>
                 <td>{t}</td>
                 <td>{n}</td>
                 <td>{r.toString()}</td>
                 <td>{r2.toString()}</td>
                 <td>{h}</td>
             </tr>
-        }
+    }
 
-        def valuesHtml(t: String, n: String, r: Range, h: BigInt): Elem = {
-            <tr>
+    def valuesHtml(t: String, n: String, r: Range, h: BigInt): Elem = {
+      <tr>
                 <td>{t}</td>
                 <td>{n}</td>
                 <td>{r.toString()}</td>
                 <td>{h}</td>
             </tr>
+    }
+
+    body().toString()
+  }
+
+  /**
+    * Makes a readable fucntional coverage report
+    * @return the report in string form
+    */
+  def report: String = {
+    val rep: StringBuilder = new StringBuilder(s"\n============ COVERAGE REPORT ============\n")
+    coverGroups.foreach(group => {
+      rep.append(s"============== GROUP ID: ${group.id} ==============\n")
+      group.points.foreach(point => {
+        rep.append(s"COVER_POINT PORT NAME: ${point.portName}\n")
+        point.bins.foreach(bin => {
+          val nHits = coverageDB.getNHits(bin)
+          rep.append(s"BIN ${bin.name} COVERING ${bin.range.toString} HAS $nHits HIT(S)\n")
+        })
+        rep.append(s"=========================================\n")
+      })
+      group.crosses.foreach(cross => {
+        rep.append(s"CROSS_POINT ${cross.name} FOR POINTS ${cross.pointName1} AND ${cross.pointName2}\n")
+        cross.bins.foreach(cb => {
+          val nHits = coverageDB.getNHits(cb)
+          rep.append(s"BIN ${cb.name} COVERING ${cb.range1.toString} CROSS ${cb.range2.toString} HAS $nHits HIT(S)\n")
+        })
+        rep.append(s"=========================================\n")
+      })
+    })
+    rep.mkString
+  }
+
+  /**
+    * Prints out a human readable coverage report
+    */
+  def printReport(): Unit = println(report)
+
+  /**
+    * Samples all of the coverpoints defined in the various covergroups
+    * and updates the values stored in the coverageDB
+    */
+  def sample(): Unit = {
+
+    def sampleBins(point: CoverPoint, value: BigInt): Unit =
+      point.bins.foreach(bin => {
+        if (bin.range contains value) {
+          coverageDB.addBinHit(bin, value)
         }
+      })
 
-        body().toString()
-    }
+    coverGroups.foreach(group => {
+      var sampledPoints: List[CoverPoint] = Nil
 
+      //Sample cross points
+      group.crosses.foreach(cross => {
+        val (point1, point2) = coverageDB.getPointsFromCross(cross)
+        val pointVal1 = point1.port.peek().litValue()
+        val pointVal2 = point2.port.peek().litValue()
 
-    /**
-      * Makes a readable fucntional coverage report
-      * @return the report in string form
-      */
-    def report: String = {
-        val rep: StringBuilder = new StringBuilder(s"\n============ COVERAGE REPORT ============\n")
-        coverGroups foreach(group => {
-            rep append s"============== GROUP ID: ${group.id} ==============\n"
-            group.points.foreach(point => {
-                rep append s"COVER_POINT PORT NAME: ${point.portName}\n"
-                point.bins.foreach(bin => {
-                    val nHits = coverageDB.getNHits(bin)
-                    rep append s"BIN ${bin.name} COVERING ${bin.range.toString} HAS $nHits HIT(S)\n"
-                })
-                rep append s"=========================================\n"
-            })
-            group.crosses.foreach(cross => {
-                rep append s"CROSS_POINT ${cross.name} FOR POINTS ${cross.pointName1} AND ${cross.pointName2}\n"
-                cross.bins.foreach(cb => {
-                    val nHits = coverageDB.getNHits(cb)
-                    rep append s"BIN ${cb.name} COVERING ${cb.range1.toString} CROSS ${cb.range2.toString} HAS $nHits HIT(S)\n"
-                })
-                rep append s"=========================================\n"
-            })
+        //Add the points to the list
+        sampledPoints = sampledPoints :+ point1
+        sampledPoints = sampledPoints :+ point2
+
+        //Sample the points individually first
+        sampleBins(point1, pointVal1)
+        sampleBins(point2, pointVal2)
+
+        //Sample the cross bins
+        cross.bins.foreach(cb => {
+          if ((cb.range1 contains pointVal1) && (cb.range2 contains pointVal2)) {
+            coverageDB.addCrossBinHit(cb, (pointVal1, pointVal2))
+          }
         })
-        rep.mkString
-    }
+      })
 
-    /**
-      * Prints out a human readable coverage report
-      */
-    def printReport(): Unit = println(report)
+      //Sample individual points
+      group.points.foreach(point => {
+        if (!sampledPoints.contains(point)) {
+          //Add the point to the list
+          sampledPoints = sampledPoints :+ point
 
-    /**
-      * Samples all of the coverpoints defined in the various covergroups
-      * and updates the values stored in the coverageDB
-      */
-    def sample(): Unit = {
+          //Check for the ports
+          val pointVal = point.port.peek().litValue()
+          sampleBins(point, pointVal)
+        }
+      })
+    })
+  }
 
-        def sampleBins(point: CoverPoint, value: BigInt) : Unit =
-            point.bins.foreach(bin => {
-                if(bin.range contains value) {
-                    coverageDB.addBinHit(bin, value)
-                }
-            })
+  /**
+    * Creates a new coverGroup given a list of coverPoints
+    * @param points the list of all coverPoints that will be sampled by the group.
+    *               These are defined by (portName: String, bins: List[BinSpec])
+    * @return the unique ID attributed to the group
+    */
+  def register(points: List[CoverPoint], crosses: List[Cross] = Nil): CoverGroup = {
+    //Generate the group's identifier
+    val gid: BigInt = coverageDB.createCoverGroup()
 
-        coverGroups foreach(group => {
-            var sampledPoints: List[CoverPoint] = Nil
+    //Register coverpoints
+    points.foreach(p => coverageDB.registerCoverPoint(p.portName, p))
+    crosses.foreach(coverageDB.registerCross)
 
-            //Sample cross points
-            group.crosses.foreach(cross => {
-                val (point1, point2) = coverageDB.getPointsFromCross(cross)
-                val pointVal1 = point1.port.peek().litValue()
-                val pointVal2 = point2.port.peek().litValue()
-
-                //Add the points to the list
-                sampledPoints = sampledPoints :+ point1
-                sampledPoints = sampledPoints :+ point2
-
-                //Sample the points individually first
-                sampleBins(point1, pointVal1)
-                sampleBins(point2, pointVal2)
-
-                //Sample the cross bins
-                cross.bins.foreach(cb => {
-                    if((cb.range1 contains pointVal1) && (cb.range2 contains pointVal2)) {
-                        coverageDB.addCrossBinHit(cb, (pointVal1, pointVal2))
-                    }
-                })
-            })
-
-            //Sample individual points
-            group.points.foreach(point => {
-                if(!sampledPoints.contains(point)) {
-                    //Add the point to the list
-                    sampledPoints = sampledPoints :+ point
-
-                    //Check for the ports
-                    val pointVal = point.port.peek().litValue()
-                    sampleBins(point, pointVal)
-                }
-            })
-        })
-    }
-
-    /**
-      * Creates a new coverGroup given a list of coverPoints
-      * @param points the list of all coverPoints that will be sampled by the group.
-      *               These are defined by (portName: String, bins: List[BinSpec])
-      * @return the unique ID attributed to the group
-      */
-    def register(points: List[CoverPoint], crosses: List[Cross] = Nil): CoverGroup = {
-        //Generate the group's identifier
-        val gid: BigInt = coverageDB.createCoverGroup()
-
-        //Register coverpoints
-        points foreach (p => coverageDB.registerCoverPoint(p.portName, p))
-        crosses foreach coverageDB.registerCross
-
-        //Create final coverGroup
-        val group = CoverGroup(gid, points, crosses)
-        coverGroups append group
-        group
-    }
+    //Create final coverGroup
+    val group = CoverGroup(gid, points, crosses)
+    coverGroups.append(group)
+    group
+  }
 }

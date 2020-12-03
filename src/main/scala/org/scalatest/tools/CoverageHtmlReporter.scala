@@ -18,7 +18,7 @@ import org.scalatest.exceptions.{StackDepth, TestFailedException}
 import org.scalatest.tools.HtmlReporter._
 import org.scalatest.tools.PrintReporter.BufferSize
 import org.scalatest.tools.StringReporter.makeDurationString
-import org.scalatest.{ResourcefulReporter, Resources, Suite, exceptions}
+import org.scalatest.{exceptions, ResourcefulReporter, Resources, Suite}
 
 import scala.collection.mutable.ListBuffer
 import scala.xml.{Elem, NodeBuffer, NodeSeq, XML}
@@ -345,11 +345,43 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
 
             nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_, "test_passed")).toList
 
-          case TestFailed(ordinal, message, suiteName, suiteId, suiteClassName, testName, testText, recordedEvents, throwable, duration, formatter, location, rerunnable, payload, threadName, timeStamp) =>
-
-            val stringToPrint = stringsToPrintOnError(Resources.failedNote, Resources.testFailed _, message, throwable, formatter, Some(suiteName), Some(testName), duration)
+          case TestFailed(
+                ordinal,
+                message,
+                suiteName,
+                suiteId,
+                suiteClassName,
+                testName,
+                testText,
+                recordedEvents,
+                throwable,
+                duration,
+                formatter,
+                location,
+                rerunnable,
+                payload,
+                threadName,
+                timeStamp
+              ) =>
+            val stringToPrint = stringsToPrintOnError(
+              Resources.failedNote,
+              Resources.testFailed _,
+              message,
+              throwable,
+              formatter,
+              Some(suiteName),
+              Some(testName),
+              duration
+            )
             val elementId = generateElementId
-            val nodeSeq = testWithDetails(elementId, List(stringToPrint), message, throwable, getIndentLevel(formatter) + 1, "test_failed")
+            val nodeSeq = testWithDetails(
+              elementId,
+              List(stringToPrint),
+              message,
+              throwable,
+              getIndentLevel(formatter) + 1,
+              "test_failed"
+            )
 
             nodeSeq :: recordedEvents.map(processInfoMarkupProvided(_, "test_failed")).toList
 
@@ -495,15 +527,27 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
           -->
           <!-- CoverGroup Results -->
           {
-            if (Files.exists(Paths.get("output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "/html/index.html"))) {
-              insertVerilatorCoverage(suiteResult.suiteId)
-            }
-          }
+      if (
+        Files.exists(
+          Paths.get(
+            "output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "/html/index.html"
+          )
+        )
+      ) {
+        insertVerilatorCoverage(suiteResult.suiteId)
+      }
+    }
           {
-            if (Files.exists(Paths.get("output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "coverageBin.html"))) {
-              insertCoverGroupResults(suiteResult.suiteId)
-            }
-          }
+      if (
+        Files.exists(
+          Paths.get(
+            "output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "coverageBin.html"
+          )
+        )
+      ) {
+        insertCoverGroupResults(suiteResult.suiteId)
+      }
+    }
         </table>
         <div id="printlink">(<a href={getSuiteFileName(suiteResult) + ".html"} target="_blank">Open {
       suiteResult.suiteName
