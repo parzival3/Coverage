@@ -33,7 +33,7 @@ module AluAccuChisel(
   always @(posedge clock) begin
     if (reset) begin // @[AluAccuChisel.scala 18:24]
       a <= 32'h0; // @[AluAccuChisel.scala 18:24]
-    end else if (io_ena) begin // @[AluAccuChisel.scala 52:17]
+    end else if (io_ena) begin // @[AluAccuChisel.scala 52:16]
       if (!(_T)) begin // @[Conditional.scala 40:58]
         if (_T_1) begin // @[Conditional.scala 39:67]
           a <= _res_T_1; // @[AluAccuChisel.scala 30:11]

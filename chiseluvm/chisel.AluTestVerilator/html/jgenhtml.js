@@ -22,6 +22,16 @@
 	 * Common "global" stuff goes in this scope.
 	 */
 
+	(function(){
+		/**
+		 * Remove the "noscript" class if we are able to execute javascript.
+		 */
+		if(document.addEventListener)
+		{
+			document.addEventListener("DOMContentLoaded", function(){document.body.classList.remove("noscript");}, false);
+		}
+	})();
+
 	(function()
 	{
 		/**
@@ -42,7 +52,6 @@
 			var container = getContainer();
 			if(container)
 			{
-				document.body.classList.remove("noscript");
 				container.addEventListener("click", clickEvent, false);
 			}
 		}
@@ -97,7 +106,38 @@
 				}
 				timer = window.setTimeout(updateState, 250);
 			}
+		}
+	})();
 
+	(function()
+	{
+		/**
+		 * Show Details control.
+		 */
+		if(document.addEventListener)
+		{
+			document.addEventListener("DOMContentLoaded", initialize, false);
+		}
+
+		/**
+		 * Wire up event listeners etc when the document is ready.
+		 */
+		function initialize()
+		{
+			document.body.addEventListener("click", clickEvent, true);
+		}
+
+		/**
+		 * Handle click events on show details button.
+		 */
+		function clickEvent($event)
+		{
+			var element = $event.target;
+			if(element.type == "button" && element.classList.contains("showDetails"))
+			{
+				$event.preventDefault();
+				document.body.classList.toggle("showDetails");
+			}
 		}
 	})();
 
@@ -143,14 +183,17 @@
 		}
 
 		/**
-		 * Handle the clieck event - works out if you clicked on a sortable table header or not.
+		 * Handle the click event - works out if you clicked on a sortable table header or not.
 		 */
 		function clickEvent($event)
 		{
-			var element = getAncestorOrSelf($event.target, "th");
-			if(element && element.classList.contains("sortable"))
+			if(!$event.defaultPrevented)
 			{
-				sortForHeaderCell(element);
+				var element = getAncestorOrSelf($event.target, "th");
+				if(element && element.classList.contains("sortable"))
+				{
+					sortForHeaderCell(element);
+				}
 			}
 		}
 
@@ -163,7 +206,7 @@
 				cols = [],
 				indeces = getStartAndEnd(element),
 				table = getAncestorOrSelf(element, "table"),
-				rows = table.querySelectorAll("tbody tr");
+				rows = table.querySelectorAll("tbody tr:not(.bound)");
 
 			for(i=indeces.start; i<= indeces.end; i++)
 			{
@@ -223,7 +266,7 @@
 		 */
 		function rearrangeRows(sortedCol)
 		{
-			var i, cell, row, tbody, len;
+			var i, cell, row, tbody, len, next, saved, rowPtr;
 			if(sortedCol)
 			{
 				for(i=0, len=sortedCol.length; i<len; i++)
@@ -231,12 +274,43 @@
 					cell = sortedCol[i];
 					row = cell.parentNode;
 					tbody = row.parentNode;
-					if(tbody.rows[i] != row)
+					rowPtr = tbody.rows[i];
+					while((next = row.nextElementSibling))
 					{
-						tbody.insertBefore(row, tbody.rows[i]);
+						if(next.classList.contains("bound"))
+						{
+							saved = row["data-savedrows"] || (row["data-savedrows"] = []);
+							saved[saved.length] = next.parentNode.removeChild(next);
+							window.setTimeout(rejoinRow.bind(row), 0);
+						}
+						else
+						{
+							break;
+						}
+					}
+					if(rowPtr != row)
+					{
+						tbody.insertBefore(row, rowPtr);
 					}
 				}
 			}
+		}
+
+		function rejoinRow()
+		{
+			var next, saved = this["data-savedrows"];
+			while((next = saved.pop()))
+			{
+				if(this.nextSibling)
+				{
+					this.parentNode.insertBefore(next, this.nextSibling);
+				}
+				else
+				{
+					this.parentNode.appendChild(next);
+				}
+			}
+
 		}
 
 		/**

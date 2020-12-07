@@ -101,7 +101,7 @@ table.stats tbody td:last-of-type
 
 .high
 {
-	background-color: #A7FC9D !important;
+	background-color: #478747 !important;
 }
 
 .med
@@ -211,9 +211,48 @@ div.header dl.legend dd
 
 table.index, table.functionCoverage
 {
-	margin-left:auto;
-	margin-right:auto;
+	margin-left: auto;
+	margin-right: auto;
 	width: 80%;
+}
+
+table.index tr.bound
+{
+	display: none;
+}
+
+body.showDetails table.index tr.bound
+{
+	display: table-row;
+}
+
+button.showDetails:before
+{
+	content: "( ";
+}
+
+button.showDetails:after
+{
+	content: " )";
+}
+
+button.showDetails
+{
+	display: none;
+	margin-left: 1em;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	text-decoration: underline;
+	background-color: inherit;
+	font-family: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+}
+
+table.showDetails button.showDetails
+{
+	display: inline-block;
 }
 
 div.descriptions
@@ -311,7 +350,7 @@ table.index td:first-of-type
 
 table.coverage
 {
-	width: 100%;
+	min-width: 10%;
 }
 
 /*
@@ -334,6 +373,8 @@ table.coverage code
 
 table.coverage td:last-child
 {
+	padding-right: 1em;
+	padding-left: 1em;
 	text-align: left;
 }
 
