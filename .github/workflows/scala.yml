@@ -33,6 +33,11 @@ jobs:
     - name: Download Snapshot of CSP
       run: git clone https://github.com/parzival3/csp.git
 
+    - name: Download Snapshot of chisel-crv
+      run: |
+        git clone https://github.com/chisel-uvm/chisel-crv.git
+        cd chisel-crv && sbt publishLocal
+
     - name: Publish Local csp
       run: cd csp && sbt publishLocal
 

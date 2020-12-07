@@ -21,13 +21,18 @@ object FileUtils {
     path.substring(path.lastIndexOf("/") + 1)
   }
 
-  def makeFolder(dir: String): Unit = {
+  def makeFolder(dir: String): Boolean = {
     val file = new File(dir + "/")
-    file.mkdir()
+    file.mkdirs()
   }
 
   def copyFiles(simDir: String, destinationDirPath: String, fileExstension: String, reanemBasedOnDir: Boolean): Unit = {
-    new File(destinationDirPath).mkdirs()
+    if (!Files.exists(Paths.get(destinationDirPath))) {
+      if (!new File(destinationDirPath).mkdirs()) {
+        throw new Exception("Couldn't create coverage directory")
+      }
+    }
+
     val filesToCopy = getListOfFiles(simDir, fileExstension)
     filesToCopy.foreach { f =>
       try {
@@ -58,14 +63,9 @@ object FileUtils {
         try {
           Files.delete(Paths.get(f.toString))
         } catch {
-          case ex @ (_: IOException | _: NoSuchFileException) => {
+          case ex @ (_: IOException | _: NoSuchFileException) =>
             println(s"Something wrong happened while deleting $f in $path")
             throw ex
-          }
-          case ex: DirectoryNotEmptyException => {
-            println(s"Cant' delete non empty directory $f in $path")
-            throw ex
-          }
         }
       }
     }
@@ -76,7 +76,7 @@ object FileUtils {
     try {
       val outputStream = new FileOutputStream(new File(toDir, targetFileName))
       try {
-        outputStream.getChannel().transferFrom(Channels.newChannel(inputStream), 0, Long.MaxValue)
+        outputStream.getChannel.transferFrom(Channels.newChannel(inputStream), 0, Long.MaxValue)
       } finally {
         outputStream.flush()
         outputStream.close()

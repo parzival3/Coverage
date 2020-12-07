@@ -31,13 +31,13 @@ class AdderUvmTest2 extends uvm_test with VerificationContext {
   }
 
   class Transaction extends RandObj(new Model) with uvm_sequence_item {
-    var x = new Rand("x",  0, 15)
+    var x = new Rand("x", 0, 15)
     var y = new Rand("y", 0, 15)
     var cin = new Rand("cin", 0x0, 1)
     var sum:  BigInt = 0
     var cout: BigInt = 0
     override def toString(): String = {
-      super.toString() + "sum = "  + sum.toString() + ", cout = " + cout.toString
+      super.toString() + "sum = " + sum.toString() + ", cout = " + cout.toString
     }
   }
 

@@ -7,8 +7,8 @@ import java.nio.channels.Channels
 import java.nio.file.Files
 import java.text.DecimalFormat
 import java.util.UUID
-
 import chiseluvm.CoverageTrait
+import com.googlecode.jgenhtml.{Config}
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.profiles.pegdown.{Extensions, PegdownOptionsAdapter}
@@ -221,7 +221,7 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
     s + (if (suiteResult.testsFailedCount > 0) "_failed" else "_passed")
 
   private def insertVerilatorCoverage(id: String): Elem = {
-    val report = coverageBase + File.separator + id + "/html/index.html"
+    val report = coverageBase + File.separator + id + "/VerilatorCoverage.html"
     <tr>
       <td> Verilator Coverage </td>
       <td id="suite_footer_coverage_value" colspan="2"> <a href={report}>Report</a> </td>
@@ -247,6 +247,7 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
         <meta http-equiv="Pragma" content="no-cache" />
         <link href="css/styles.css" rel="stylesheet" />
         {
+
       cssUrl match {
         case Some(cssUrl) =>
           <link href="css/custom.css" rel="stylesheet" />
@@ -520,17 +521,11 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
     }
             </td>
           </tr>
-          <!-- Verilator Coverage Results
-          {
-                insertVerilatorCoverage(suiteResult.suiteId)
-          }
-          -->
-          <!-- CoverGroup Results -->
           {
       if (
         Files.exists(
           Paths.get(
-            "output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "/html/index.html"
+            "output" + File.separator + coverageBase + File.separator + suiteResult.suiteId + File.separator + "VerilatorCoverage.html"
           )
         )
       ) {
@@ -1171,6 +1166,8 @@ private[scalatest] class CoverageHtmlReporter extends ResourcefulReporter {
             threadName,
             timeStamp
           ) =>
+        // CreateCoverageReport(directoryPath)
+
         val (suiteEvents, otherEvents) = extractSuiteEvents(suiteId)
         eventList = otherEvents
         val sortedSuiteEvents = suiteEvents.sorted

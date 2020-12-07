@@ -111,7 +111,7 @@ class Environment(val adder: Adder4Bit, reporter: CoverageReporter) extends uvm_
 
 class AdderUvmTest extends uvm_test {
 
-  "Adder" should "add" in {
+  "AdderUvm" should "add" in {
 
     test(new Adder4Bit).withAnnotations(VerilatorCoverage) { adder =>
       val AdderEnv = new Environment(adder, coverageReporter)
